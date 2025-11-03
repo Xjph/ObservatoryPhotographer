@@ -1,0 +1,256 @@
+﻿namespace Observatory.Photographer.UI
+{
+    partial class WatermarkForm
+    {
+        /// <summary>
+        /// Required designer variable.
+        /// </summary>
+        private System.ComponentModel.IContainer components = null;
+
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        #region Windows Form Designer generated code
+
+        /// <summary>
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent()
+        {
+            PathLabel = new Label();
+            PathTextbox = new TextBox();
+            BrowseButton = new Button();
+            OkButton = new Button();
+            groupBox1 = new GroupBox();
+            LocationRelativeCheckbox = new CheckBox();
+            LocationYLabel = new Label();
+            LocationXLabel = new Label();
+            LocationYSpinner = new NumericUpDown();
+            LocationXSpinner = new NumericUpDown();
+            LocationSpecificRadio = new RadioButton();
+            QuadOrderCheckbox = new CheckBox();
+            LocationQuadDropdown = new ComboBox();
+            LocationQuadRadio = new RadioButton();
+            AutoOrderCheckbox = new CheckBox();
+            AutomaticLocationRadio = new RadioButton();
+            groupBox1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)LocationYSpinner).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)LocationXSpinner).BeginInit();
+            SuspendLayout();
+            // 
+            // PathLabel
+            // 
+            PathLabel.AutoSize = true;
+            PathLabel.Location = new Point(12, 9);
+            PathLabel.Name = "PathLabel";
+            PathLabel.Size = new Size(34, 15);
+            PathLabel.TabIndex = 0;
+            PathLabel.Text = "Path:";
+            // 
+            // PathTextbox
+            // 
+            PathTextbox.Location = new Point(52, 6);
+            PathTextbox.Name = "PathTextbox";
+            PathTextbox.Size = new Size(217, 23);
+            PathTextbox.TabIndex = 1;
+            PathTextbox.TextChanged += PathTextbox_TextChanged;
+            // 
+            // BrowseButton
+            // 
+            BrowseButton.FlatAppearance.BorderSize = 0;
+            BrowseButton.FlatStyle = FlatStyle.Flat;
+            BrowseButton.Location = new Point(278, 6);
+            BrowseButton.Name = "BrowseButton";
+            BrowseButton.Size = new Size(75, 23);
+            BrowseButton.TabIndex = 2;
+            BrowseButton.Text = "Browse";
+            BrowseButton.UseVisualStyleBackColor = true;
+            BrowseButton.Click += BrowseButton_Click;
+            // 
+            // OkButton
+            // 
+            OkButton.FlatAppearance.BorderSize = 0;
+            OkButton.FlatStyle = FlatStyle.Flat;
+            OkButton.Location = new Point(278, 312);
+            OkButton.Name = "OkButton";
+            OkButton.Size = new Size(75, 23);
+            OkButton.TabIndex = 6;
+            OkButton.Text = "OK";
+            OkButton.UseVisualStyleBackColor = true;
+            OkButton.Click += OkButton_Click;
+            // 
+            // groupBox1
+            // 
+            groupBox1.Controls.Add(LocationRelativeCheckbox);
+            groupBox1.Controls.Add(LocationYLabel);
+            groupBox1.Controls.Add(LocationXLabel);
+            groupBox1.Controls.Add(LocationYSpinner);
+            groupBox1.Controls.Add(LocationXSpinner);
+            groupBox1.Controls.Add(LocationSpecificRadio);
+            groupBox1.Controls.Add(QuadOrderCheckbox);
+            groupBox1.Controls.Add(LocationQuadDropdown);
+            groupBox1.Controls.Add(LocationQuadRadio);
+            groupBox1.Controls.Add(AutoOrderCheckbox);
+            groupBox1.Controls.Add(AutomaticLocationRadio);
+            groupBox1.Location = new Point(12, 35);
+            groupBox1.Name = "groupBox1";
+            groupBox1.Size = new Size(341, 271);
+            groupBox1.TabIndex = 8;
+            groupBox1.TabStop = false;
+            groupBox1.Text = "Location";
+            // 
+            // LocationRelativeCheckbox
+            // 
+            LocationRelativeCheckbox.AutoSize = true;
+            LocationRelativeCheckbox.Location = new Point(25, 234);
+            LocationRelativeCheckbox.Name = "LocationRelativeCheckbox";
+            LocationRelativeCheckbox.Size = new Size(67, 19);
+            LocationRelativeCheckbox.TabIndex = 11;
+            LocationRelativeCheckbox.Text = "Relative";
+            LocationRelativeCheckbox.UseVisualStyleBackColor = true;
+            // 
+            // LocationYLabel
+            // 
+            LocationYLabel.AutoSize = true;
+            LocationYLabel.Location = new Point(98, 207);
+            LocationYLabel.Name = "LocationYLabel";
+            LocationYLabel.Size = new Size(13, 15);
+            LocationYLabel.TabIndex = 10;
+            LocationYLabel.Text = "y";
+            // 
+            // LocationXLabel
+            // 
+            LocationXLabel.AutoSize = true;
+            LocationXLabel.Location = new Point(98, 178);
+            LocationXLabel.Name = "LocationXLabel";
+            LocationXLabel.Size = new Size(13, 15);
+            LocationXLabel.TabIndex = 9;
+            LocationXLabel.Text = "x";
+            // 
+            // LocationYSpinner
+            // 
+            LocationYSpinner.Location = new Point(25, 205);
+            LocationYSpinner.Name = "LocationYSpinner";
+            LocationYSpinner.Size = new Size(67, 23);
+            LocationYSpinner.TabIndex = 8;
+            // 
+            // LocationXSpinner
+            // 
+            LocationXSpinner.Location = new Point(25, 176);
+            LocationXSpinner.Name = "LocationXSpinner";
+            LocationXSpinner.Size = new Size(67, 23);
+            LocationXSpinner.TabIndex = 7;
+            // 
+            // LocationSpecificRadio
+            // 
+            LocationSpecificRadio.AutoSize = true;
+            LocationSpecificRadio.Location = new Point(6, 151);
+            LocationSpecificRadio.Name = "LocationSpecificRadio";
+            LocationSpecificRadio.Size = new Size(114, 19);
+            LocationSpecificRadio.TabIndex = 6;
+            LocationSpecificRadio.TabStop = true;
+            LocationSpecificRadio.Text = "Manual Location";
+            LocationSpecificRadio.UseVisualStyleBackColor = true;
+            // 
+            // QuadOrderCheckbox
+            // 
+            QuadOrderCheckbox.AutoSize = true;
+            QuadOrderCheckbox.Location = new Point(24, 126);
+            QuadOrderCheckbox.Name = "QuadOrderCheckbox";
+            QuadOrderCheckbox.Size = new Size(98, 19);
+            QuadOrderCheckbox.TabIndex = 5;
+            QuadOrderCheckbox.Text = "Second Order";
+            QuadOrderCheckbox.UseVisualStyleBackColor = true;
+            // 
+            // LocationQuadDropdown
+            // 
+            LocationQuadDropdown.DropDownStyle = ComboBoxStyle.DropDownList;
+            LocationQuadDropdown.FormattingEnabled = true;
+            LocationQuadDropdown.Location = new Point(24, 97);
+            LocationQuadDropdown.Name = "LocationQuadDropdown";
+            LocationQuadDropdown.Size = new Size(205, 23);
+            LocationQuadDropdown.TabIndex = 4;
+            // 
+            // LocationQuadRadio
+            // 
+            LocationQuadRadio.AutoSize = true;
+            LocationQuadRadio.Location = new Point(6, 72);
+            LocationQuadRadio.Name = "LocationQuadRadio";
+            LocationQuadRadio.Size = new Size(106, 19);
+            LocationQuadRadio.TabIndex = 3;
+            LocationQuadRadio.TabStop = true;
+            LocationQuadRadio.Text = "Fixed Quadrant";
+            LocationQuadRadio.UseVisualStyleBackColor = true;
+            // 
+            // AutoOrderCheckbox
+            // 
+            AutoOrderCheckbox.AutoSize = true;
+            AutoOrderCheckbox.Location = new Point(24, 47);
+            AutoOrderCheckbox.Name = "AutoOrderCheckbox";
+            AutoOrderCheckbox.Size = new Size(73, 19);
+            AutoOrderCheckbox.TabIndex = 2;
+            AutoOrderCheckbox.Text = "Two Pass";
+            AutoOrderCheckbox.UseVisualStyleBackColor = true;
+            // 
+            // AutomaticLocationRadio
+            // 
+            AutomaticLocationRadio.AutoSize = true;
+            AutomaticLocationRadio.Location = new Point(6, 22);
+            AutomaticLocationRadio.Name = "AutomaticLocationRadio";
+            AutomaticLocationRadio.Size = new Size(223, 19);
+            AutomaticLocationRadio.TabIndex = 0;
+            AutomaticLocationRadio.TabStop = true;
+            AutomaticLocationRadio.Text = "Automatically Determine Open Space";
+            AutomaticLocationRadio.UseVisualStyleBackColor = true;
+            // 
+            // WatermarkForm
+            // 
+            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(369, 350);
+            Controls.Add(groupBox1);
+            Controls.Add(OkButton);
+            Controls.Add(BrowseButton);
+            Controls.Add(PathTextbox);
+            Controls.Add(PathLabel);
+            Name = "WatermarkForm";
+            Text = "Watermark Setup";
+            groupBox1.ResumeLayout(false);
+            groupBox1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)LocationYSpinner).EndInit();
+            ((System.ComponentModel.ISupportInitialize)LocationXSpinner).EndInit();
+            ResumeLayout(false);
+            PerformLayout();
+        }
+
+        #endregion
+
+        private Label PathLabel;
+        private TextBox PathTextbox;
+        private Button BrowseButton;
+        private Button OkButton;
+        private GroupBox groupBox1;
+        private CheckBox LocationRelativeCheckbox;
+        private Label LocationYLabel;
+        private Label LocationXLabel;
+        private NumericUpDown LocationYSpinner;
+        private NumericUpDown LocationXSpinner;
+        private RadioButton LocationSpecificRadio;
+        private CheckBox QuadOrderCheckbox;
+        private ComboBox LocationQuadDropdown;
+        private RadioButton LocationQuadRadio;
+        private CheckBox AutoOrderCheckbox;
+        private RadioButton AutomaticLocationRadio;
+    }
+}
