@@ -11,7 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Magick.NET-Q8-x64" Version="14.8.2" />
+    <PackageReference Include="Magick.NET-Q8-x64" Version="14.10.2" />
   </ItemGroup>
 
 	<PropertyGroup>

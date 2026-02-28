@@ -1,9 +1,10 @@
-﻿using ImageMagick;
-using Observatory.Framework;
+﻿using Observatory.Framework;
 using Observatory.Framework.Files;
 using Observatory.Framework.Files.Journal;
 using Observatory.Framework.Interfaces;
 using System.Text;
+using System.Text.Json;
+using ImageMagick;
 
 namespace Observatory.Photographer
 {
@@ -14,7 +15,10 @@ namespace Observatory.Photographer
         private UI.MainPanel _ui;
         private ImageList _imageList;
         private PhotoSettings _settings;
-        private Dictionary<string, string> _imageData;
+        private Dictionary<string, ImageWithMetadata> _imageData;
+        private List<Task> _processingTasks = [];
+        private Dictionary<string, Status> _persistedStatus;
+        private readonly string _statusStoragePath;
 
         public Photographer(IObservatoryCore core, PhotoWorker worker, UI.MainPanel ui, PhotoSettings photoSettings)
         {
@@ -22,6 +26,7 @@ namespace Observatory.Photographer
             _worker = worker;
             _ui = ui;
             ui.Core = core;
+            ui.Photographer = this;
             ui.Worker = worker;
             _imageList = new();
             _ui.PhotoListView.LargeImageList = _imageList;
@@ -29,47 +34,121 @@ namespace Observatory.Photographer
             _ui.PhotoListView.LargeImageList.ImageSize = new Size(256, 256);
             _settings = photoSettings;
             _imageData = [];
+            _persistedStatus = [];
+            _statusStoragePath = Path.Combine(_core.PluginStorageFolder, "screenshot_status.json");
+            LoadPersistedStatus();
             _ui.PhotoListView.SelectedIndexChanged += SelectedImageChanged;
         }
 
         private void SelectedImageChanged(object? sender, EventArgs e)
         {
             if (_ui.PhotoListView.SelectedItems.Count > 0)
-                _ui.DataLabel.Text = _imageData[_ui.PhotoListView.SelectedItems[0].ImageKey];
+                _ui.DataLabel.Text = CreateImageDataText(_imageData[_ui.PhotoListView.SelectedItems[0].ImageKey].Screenshot, _ui.PhotoListView.SelectedItems[0].ImageKey);
+            //BuildImageCaption(_imageData[_ui.PhotoListView.SelectedItems[0].ImageKey]);
+        }
+
+        private static string BuildImageCaption(ImageWithMetadata metadata)
+        {
+            // Simple one-line title to display under thumbnail
+            // System - Body - Time with fallback to filename
+            StringBuilder caption = new();
+            if (!string.IsNullOrEmpty(metadata.Screenshot.System))
+            {
+                caption.Append(metadata.Screenshot.System);
+                if (!string.IsNullOrEmpty(metadata.Screenshot.Body))
+                {
+                    caption.Append(" - ");
+                    caption.Append(metadata.Screenshot.Body);
+                }
+                caption.Append(" - ");
+                caption.Append(metadata.Screenshot.TimestampDateTime.ToString("g"));
+            }
+            else
+            {
+                caption.Append(metadata.Screenshot.Filename.Split('\\').Last());
+            }
+
+            return caption.ToString();
+        }
+
+        private void LoadPersistedStatus()
+        {
+            if (File.Exists(_statusStoragePath))
+            {
+                try
+                {
+                    var json = File.ReadAllText(_statusStoragePath);
+                    _persistedStatus = JsonSerializer.Deserialize<Dictionary<string, Status>>(json) ?? [];
+                }
+                catch
+                {
+                    _persistedStatus = [];
+                }
+            }
+        }
+
+        private void SavePersistedStatus()
+        {
+            try
+            {
+                var json = JsonSerializer.Serialize(_persistedStatus, new JsonSerializerOptions { WriteIndented = true });
+                File.WriteAllText(_statusStoragePath, json);
+            }
+            catch
+            {
+                // Silently fail if unable to save
+            }
+        }
+
+        private void TaskCleanup()
+        {
+            _processingTasks = [.. _processingTasks.Where(t => !t.IsCompleted)];
         }
 
         public void HandleScreenshot(Screenshot screenshot)
         {
+            TaskCleanup();
             if (Proceed(_core.CurrentLogMonitorState))
             {
                 var picturesPath = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
                 var filename = screenshot.Filename
-                    .Replace("\\\\", "\\")
+                    // .Replace("\\\\", "\\")
                     .Replace("\\ED_Pictures", string.Empty);
 
                 var fullFilename = FindImagePath(filename);
 
-                if (!string.IsNullOrEmpty(fullFilename))
-                {
-                    var file = new FileInfo(fullFilename);
-
-                    _core.ExecuteOnUIThread(() =>
+                _processingTasks.Add(Task.Run(() => { 
+                    if (!string.IsNullOrEmpty(fullFilename))
                     {
-                        if (_ui.PhotoListView.LargeImageList?.Images.ContainsKey(fullFilename) ?? false)
+                        var file = new FileInfo(fullFilename);
+
+                        var uiExec = (Action action) => _core.ExecuteOnUIThread(action);
+
+                        var largeImageKeys = _ui.PhotoListView.LargeImageList?.Images.Keys.Cast<string>().ToList() ?? [];
+                        List<ListViewItem> imageItems = [];
+                        uiExec(() => imageItems = [.. _ui.PhotoListView.Items.Cast<ListViewItem>()]);
+
+
+                        MagickImage original = new(fullFilename);
+                        if (largeImageKeys.Contains(fullFilename))
                         {
-                            var staleItem = _ui.PhotoListView.Items.Cast<ListViewItem>().Where(item => item.ImageKey == fullFilename);
+                            var staleItem = imageItems.Where(item => item.ImageKey == fullFilename);
                             if (staleItem.Any())
                             {
-                                _ui.PhotoListView.Items.Remove(staleItem.First());
+                                uiExec(() => _ui.PhotoListView.Items.Remove(staleItem.First()));
                             }
                         }
                         else
                         {
-                            var original = Image.FromFile(fullFilename);
                             var aspect = original.Width / (double)original.Height;
-                            var resized = new Bitmap(original, new Size(256, (int)Math.Floor(256 / aspect)));
-                            _ui.PhotoListView.LargeImageList.ImageSize = new Size(256, (int)Math.Floor(256 / aspect));
-                            _ui.PhotoListView.LargeImageList?.Images.Add(fullFilename, resized);
+                            int thumbWidth = 256;
+                            int thumbHeight = (int)Math.Floor(256 / aspect);
+                            var resized = MagickToBitmap(original, thumbWidth, thumbHeight);
+                            uiExec(() =>
+                            {
+                                _ui.PhotoListView.LargeImageList!.ImageSize = new Size(thumbWidth, thumbHeight);
+                                _ui.PhotoListView.LargeImageList!.Images.Add(fullFilename, resized);
+                            });
                         }
 
                         string itemLabel;
@@ -79,33 +158,46 @@ namespace Observatory.Photographer
                         else
                             itemLabel = screenshot.Timestamp;
 
-                        _ui.PhotoListView.Items.Add(new ListViewItem(screenshot.System) { ImageKey = fullFilename });
-                        _imageData[fullFilename] = CreateImageDataText(screenshot, fullFilename);
+                        Status? status = null;
+                        var isRealtime = StatusIsCurrent(_core.CurrentLogMonitorState);
+                        
+                        if (isRealtime)
+                        {
+                            status = _core.GetStatus();
+                            if (status != null)
+                            {
+                                _persistedStatus[fullFilename] = status;
+                                SavePersistedStatus();
+                            }
+                        }
+                        else
+                        {
+                            _persistedStatus.TryGetValue(fullFilename, out status);
+                        }
 
-                    });
-
-                    var image = new MagickImage(File.ReadAllBytes(fullFilename));
-                    var openQuad = ImageUtils.FindOpenQuad(image);
-                    Rectangle quadBounds;
-                    var width = (int)image.Width;
-                    var height = (int)image.Height;
-                    switch (openQuad)
-                    {
-                        case 0: // Top left
-                            quadBounds = new(0, 0, width / 2, height / 2);
-                            break;
-                        case 1: // Top right
-                            quadBounds = new(width / 2, 0, width / 2, height / 2);
-                            break;
-                        case 2: // Bottom left
-                            quadBounds = new(0, height / 2, width / 2, height / 2);
-                            break;
-                        case 3: // Bottom right
-                        default:
-                            quadBounds = new(width / 2, height / 2, width / 2, height / 2);
-                            break;
+                        uiExec(()=>_ui.PhotoListView.Items.Add(new ListViewItem(screenshot.System) { ImageKey = fullFilename }));
+                        _imageData[fullFilename] = new (original, screenshot, status);
                     }
-                }
+                }));
+            }
+        }
+
+        public ImageWithMetadata? GetImageMetadata(string imageKey)
+        {
+            if (_imageData.TryGetValue(imageKey, out ImageWithMetadata? value))
+                return value;
+            return null;
+        }
+
+        private static Bitmap MagickToBitmap(MagickImage magickImage, int width, int height)
+        {
+            var resized = magickImage.Clone();
+            resized.Resize((uint)width, (uint)height);
+            using (var ms = new MemoryStream())
+            {
+                resized.Write(ms, MagickFormat.Bmp);
+                ms.Seek(0, SeekOrigin.Begin);
+                return new Bitmap(ms);
             }
         }
 
@@ -118,6 +210,8 @@ namespace Observatory.Photographer
             return batchCheck && realtimeCheck && !state.HasFlag(LogMonitorState.PreRead);    
         }
 
+        private bool StatusIsCurrent(LogMonitorState state) => state.HasFlag(LogMonitorState.Realtime);
+        
         private static string CreateImageDataText(Screenshot screenshot, string fullFilename)
         {
             StringBuilder dataText = new();

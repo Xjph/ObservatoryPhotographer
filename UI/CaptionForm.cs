@@ -21,7 +21,32 @@
             {
                 InitializeComponent();
                 PopulateQuads();
+                LoadAction();
             }
+        }
+
+        private void LoadAction()
+        {
+            QuadOrderCheckbox.Checked = CaptionAction.SecondOrder;
+            AutoOrderCheckbox.Checked = CaptionAction.SecondOrder;
+            LocationQuadDropdown.SelectedIndex = CaptionAction.QuadValue;
+            LocationRelativeCheckbox.Checked = CaptionAction.Relative;
+            LocationXSpinner.Value = CaptionAction.Location.X;
+            LocationYSpinner.Value = CaptionAction.Location.Y;
+            switch (CaptionAction.LocationMethod)
+            {
+                case LocationMethod.Automatic:
+                    AutomaticLocationRadio.Checked = true;
+                    break;
+                case LocationMethod.Quadrant:
+                    LocationQuadRadio.Checked = true;
+                    break;
+                case LocationMethod.Manual:
+                    LocationSpecificRadio.Checked = true;
+                    break;
+            }
+            FontSampleLabel.Text = CaptionAction.Font.Name;
+            FontSampleLabel.Font = CaptionAction.Font;
         }
 
         private void PopulateQuads()

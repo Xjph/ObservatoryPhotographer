@@ -28,17 +28,16 @@
         /// </summary>
         private void InitializeComponent()
         {
-            ConvertCheckbox = new CheckBox();
             ResizeCheckbox = new CheckBox();
             ConvertDropdown = new ComboBox();
             ResizeFixed = new RadioButton();
             ResizeScale = new RadioButton();
             panel1 = new Panel();
             PercentLabel = new Label();
-            numericUpDown3 = new NumericUpDown();
-            numericUpDown2 = new NumericUpDown();
+            ResizePercentSpinner = new NumericUpDown();
+            ResizeYSpinner = new NumericUpDown();
             xLabel = new Label();
-            numericUpDown1 = new NumericUpDown();
+            ResizeXSpinner = new NumericUpDown();
             QualityLabel = new Label();
             QualitySpinner = new NumericUpDown();
             CaptionCheckbox = new CheckBox();
@@ -55,23 +54,14 @@
             FilenameTextbox = new TextBox();
             ExampleBox = new GroupBox();
             ExampleLabel = new Label();
+            label1 = new Label();
             panel1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)numericUpDown3).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)numericUpDown2).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)numericUpDown1).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)ResizePercentSpinner).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)ResizeYSpinner).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)ResizeXSpinner).BeginInit();
             ((System.ComponentModel.ISupportInitialize)QualitySpinner).BeginInit();
             ExampleBox.SuspendLayout();
             SuspendLayout();
-            // 
-            // ConvertCheckbox
-            // 
-            ConvertCheckbox.AutoSize = true;
-            ConvertCheckbox.Location = new Point(12, 12);
-            ConvertCheckbox.Name = "ConvertCheckbox";
-            ConvertCheckbox.Size = new Size(68, 19);
-            ConvertCheckbox.TabIndex = 0;
-            ConvertCheckbox.Text = "Convert";
-            ConvertCheckbox.UseVisualStyleBackColor = true;
             // 
             // ResizeCheckbox
             // 
@@ -83,16 +73,18 @@
             ResizeCheckbox.TabIndex = 1;
             ResizeCheckbox.Text = "Resize";
             ResizeCheckbox.UseVisualStyleBackColor = true;
+            ResizeCheckbox.CheckedChanged += ResizeCheckbox_CheckedChanged;
             // 
             // ConvertDropdown
             // 
             ConvertDropdown.DropDownStyle = ComboBoxStyle.DropDownList;
             ConvertDropdown.FormattingEnabled = true;
             ConvertDropdown.Items.AddRange(new object[] { "JPEG", "PNG", "HEIC", "WEBP", "BMP" });
-            ConvertDropdown.Location = new Point(86, 10);
+            ConvertDropdown.Location = new Point(63, 10);
             ConvertDropdown.Name = "ConvertDropdown";
-            ConvertDropdown.Size = new Size(118, 23);
+            ConvertDropdown.Size = new Size(126, 23);
             ConvertDropdown.TabIndex = 2;
+            ConvertDropdown.SelectedIndexChanged += ConvertDropdown_SelectedIndexChanged;
             // 
             // ResizeFixed
             // 
@@ -104,6 +96,7 @@
             ResizeFixed.TabStop = true;
             ResizeFixed.Text = "Dimensions";
             ResizeFixed.UseVisualStyleBackColor = true;
+            ResizeFixed.CheckedChanged += ResizeFixed_CheckedChanged;
             // 
             // ResizeScale
             // 
@@ -115,15 +108,16 @@
             ResizeScale.TabStop = true;
             ResizeScale.Text = "Percent";
             ResizeScale.UseVisualStyleBackColor = true;
+            ResizeScale.CheckedChanged += ResizeScale_CheckedChanged;
             // 
             // panel1
             // 
             panel1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             panel1.Controls.Add(PercentLabel);
-            panel1.Controls.Add(numericUpDown3);
-            panel1.Controls.Add(numericUpDown2);
+            panel1.Controls.Add(ResizePercentSpinner);
+            panel1.Controls.Add(ResizeYSpinner);
             panel1.Controls.Add(xLabel);
-            panel1.Controls.Add(numericUpDown1);
+            panel1.Controls.Add(ResizeXSpinner);
             panel1.Controls.Add(ResizeFixed);
             panel1.Controls.Add(ResizeScale);
             panel1.Location = new Point(12, 55);
@@ -140,43 +134,46 @@
             PercentLabel.TabIndex = 8;
             PercentLabel.Text = "%";
             // 
-            // numericUpDown3
+            // ResizePercentSpinner
             // 
-            numericUpDown3.Location = new Point(96, 28);
-            numericUpDown3.Name = "numericUpDown3";
-            numericUpDown3.Size = new Size(47, 23);
-            numericUpDown3.TabIndex = 8;
-            numericUpDown3.Value = new decimal(new int[] { 100, 0, 0, 0 });
+            ResizePercentSpinner.Location = new Point(96, 28);
+            ResizePercentSpinner.Name = "ResizePercentSpinner";
+            ResizePercentSpinner.Size = new Size(47, 23);
+            ResizePercentSpinner.TabIndex = 8;
+            ResizePercentSpinner.Value = new decimal(new int[] { 100, 0, 0, 0 });
+            ResizePercentSpinner.ValueChanged += ResizePercentSpinner_ValueChanged;
             // 
-            // numericUpDown2
+            // ResizeYSpinner
             // 
-            numericUpDown2.Location = new Point(184, 3);
-            numericUpDown2.Maximum = new decimal(new int[] { 99999, 0, 0, 0 });
-            numericUpDown2.Name = "numericUpDown2";
-            numericUpDown2.Size = new Size(63, 23);
-            numericUpDown2.TabIndex = 8;
+            ResizeYSpinner.Location = new Point(184, 3);
+            ResizeYSpinner.Maximum = new decimal(new int[] { 99999, 0, 0, 0 });
+            ResizeYSpinner.Name = "ResizeYSpinner";
+            ResizeYSpinner.Size = new Size(63, 23);
+            ResizeYSpinner.TabIndex = 8;
+            ResizeYSpinner.ValueChanged += ResizeYSpinner_ValueChanged;
             // 
             // xLabel
             // 
             xLabel.AutoSize = true;
             xLabel.Location = new Point(165, 7);
             xLabel.Name = "xLabel";
-            xLabel.Size = new Size(13, 15);
+            xLabel.Size = new Size(12, 15);
             xLabel.TabIndex = 8;
             xLabel.Text = "x";
             // 
-            // numericUpDown1
+            // ResizeXSpinner
             // 
-            numericUpDown1.Location = new Point(96, 3);
-            numericUpDown1.Maximum = new decimal(new int[] { 99999, 0, 0, 0 });
-            numericUpDown1.Name = "numericUpDown1";
-            numericUpDown1.Size = new Size(63, 23);
-            numericUpDown1.TabIndex = 5;
+            ResizeXSpinner.Location = new Point(96, 3);
+            ResizeXSpinner.Maximum = new decimal(new int[] { 99999, 0, 0, 0 });
+            ResizeXSpinner.Name = "ResizeXSpinner";
+            ResizeXSpinner.Size = new Size(63, 23);
+            ResizeXSpinner.TabIndex = 5;
+            ResizeXSpinner.ValueChanged += ResizeXSpinner_ValueChanged;
             // 
             // QualityLabel
             // 
             QualityLabel.AutoSize = true;
-            QualityLabel.Location = new Point(213, 13);
+            QualityLabel.Location = new Point(196, 13);
             QualityLabel.Name = "QualityLabel";
             QualityLabel.Size = new Size(48, 15);
             QualityLabel.TabIndex = 6;
@@ -184,10 +181,11 @@
             // 
             // QualitySpinner
             // 
-            QualitySpinner.Location = new Point(267, 11);
+            QualitySpinner.Location = new Point(250, 11);
             QualitySpinner.Name = "QualitySpinner";
-            QualitySpinner.Size = new Size(43, 23);
+            QualitySpinner.Size = new Size(60, 23);
             QualitySpinner.TabIndex = 7;
+            QualitySpinner.ValueChanged += QualitySpinner_ValueChanged;
             // 
             // CaptionCheckbox
             // 
@@ -220,6 +218,7 @@
             CaptionTextbox.Name = "CaptionTextbox";
             CaptionTextbox.Size = new Size(298, 95);
             CaptionTextbox.TabIndex = 10;
+            CaptionTextbox.TextChanged += CaptionTextbox_TextChanged;
             // 
             // WatermarkCheckbox
             // 
@@ -315,6 +314,7 @@
             FilenameLink.TabIndex = 18;
             FilenameLink.TabStop = true;
             FilenameLink.Text = "(?)";
+            FilenameLink.LinkClicked += FilenameLink_LinkClicked;
             // 
             // FilenameTextbox
             // 
@@ -323,6 +323,7 @@
             FilenameTextbox.Name = "FilenameTextbox";
             FilenameTextbox.Size = new Size(298, 23);
             FilenameTextbox.TabIndex = 19;
+            FilenameTextbox.TextChanged += FilenameTextbox_TextChanged;
             // 
             // ExampleBox
             // 
@@ -339,15 +340,25 @@
             ExampleLabel.AutoSize = true;
             ExampleLabel.Location = new Point(6, 19);
             ExampleLabel.Name = "ExampleLabel";
-            ExampleLabel.Size = new Size(127, 15);
+            ExampleLabel.Size = new Size(126, 15);
             ExampleLabel.TabIndex = 0;
             ExampleLabel.Text = "Filename Example Text";
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new Point(12, 13);
+            label1.Name = "label1";
+            label1.Size = new Size(45, 15);
+            label1.TabIndex = 21;
+            label1.Text = "Format";
             // 
             // ProcessForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(324, 531);
+            Controls.Add(label1);
             Controls.Add(ExampleBox);
             Controls.Add(FilenameTextbox);
             Controls.Add(FilenameLink);
@@ -366,16 +377,15 @@
             Controls.Add(ResizeCheckbox);
             Controls.Add(panel1);
             Controls.Add(ConvertDropdown);
-            Controls.Add(ConvertCheckbox);
             FormBorderStyle = FormBorderStyle.SizableToolWindow;
             MinimumSize = new Size(340, 360);
             Name = "ProcessForm";
             Text = "Process Image";
             panel1.ResumeLayout(false);
             panel1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)numericUpDown3).EndInit();
-            ((System.ComponentModel.ISupportInitialize)numericUpDown2).EndInit();
-            ((System.ComponentModel.ISupportInitialize)numericUpDown1).EndInit();
+            ((System.ComponentModel.ISupportInitialize)ResizePercentSpinner).EndInit();
+            ((System.ComponentModel.ISupportInitialize)ResizeYSpinner).EndInit();
+            ((System.ComponentModel.ISupportInitialize)ResizeXSpinner).EndInit();
             ((System.ComponentModel.ISupportInitialize)QualitySpinner).EndInit();
             ExampleBox.ResumeLayout(false);
             ExampleBox.PerformLayout();
@@ -384,8 +394,6 @@
         }
 
         #endregion
-
-        private CheckBox ConvertCheckbox;
         private CheckBox ResizeCheckbox;
         private ComboBox ConvertDropdown;
         private RadioButton ResizeFixed;
@@ -394,10 +402,10 @@
         private Label QualityLabel;
         private NumericUpDown QualitySpinner;
         private Label PercentLabel;
-        private NumericUpDown numericUpDown3;
-        private NumericUpDown numericUpDown2;
+        private NumericUpDown ResizePercentSpinner;
+        private NumericUpDown ResizeYSpinner;
         private Label xLabel;
-        private NumericUpDown numericUpDown1;
+        private NumericUpDown ResizeXSpinner;
         private CheckBox CaptionCheckbox;
         private Button CaptionButton;
         private TextBox CaptionTextbox;
@@ -412,5 +420,6 @@
         private TextBox FilenameTextbox;
         private GroupBox ExampleBox;
         private Label ExampleLabel;
+        private Label label1;
     }
 }

@@ -24,7 +24,28 @@
                 // Override theme
                 // Using text color to indicate good path
                 PathTextbox.BackColor = Color.White;
+                LoadAction();
             }
+        }
+
+        private void LoadAction()
+        {
+            PathTextbox.Text = WatermarkAction.WatermarkImagePath;
+            switch (WatermarkAction.LocationMethod)
+            {
+                case LocationMethod.Automatic:
+                    AutomaticLocationRadio.Checked = true;
+                    break;
+                case LocationMethod.Quadrant:
+                    LocationQuadRadio.Checked = true;
+                    break;
+                case LocationMethod.Manual:
+                    LocationSpecificRadio.Checked = true;
+                    break;
+            }
+            LocationQuadDropdown.SelectedIndex = WatermarkAction.QuadValue;
+            LocationXSpinner.Value = WatermarkAction.Location.X;
+            LocationYSpinner.Value = WatermarkAction.Location.Y;
         }
 
         private void BrowseButton_Click(object sender, EventArgs e)
@@ -50,6 +71,7 @@
             if (result == DialogResult.OK)
             {
                 PathTextbox.Text = dialog.FileName;
+                WatermarkAction.WatermarkImagePath = dialog.FileName;
             }
         }
 

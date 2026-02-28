@@ -21,6 +21,7 @@ namespace Observatory.Photographer
     public abstract class PhotoAction
     {
         public abstract PhotoActionKind Action { get; }
+        // public required ImageWithMetadata Metadata { get; set; }
     }
 
     public class MetaAction : PhotoAction
@@ -33,7 +34,9 @@ namespace Observatory.Photographer
         public override PhotoActionKind Action { get => PhotoActionKind.Save; }
         public required MagickFormat Format { get; set; }
         public uint Quality { get; set; } = 75;
-        public required string Path { get; set; }
+        public required string FolderPath { get; set; }
+        public required string FilePattern { get; set; }
+        public required string CmdrName { get; set; }
     }
 
     public class ResizeAction : PhotoAction
@@ -50,7 +53,7 @@ namespace Observatory.Photographer
         public string Text { get; set; } = string.Empty;
         public required Font Font { get; set; }
         public MagickColor Color { get; set; } = new();
-        public int QuadValue { private get; set; }
+        public int QuadValue { get; set; }
         public ImageUtils.Quad Quad 
         { 
             get 
@@ -69,13 +72,14 @@ namespace Observatory.Photographer
         public bool Relative { get; set; }
         public LocationMethod LocationMethod { get; set; }
         public bool SecondOrder { get; set; }
+        public required string CmdrName { get; set; }
     }
 
     public class WatermarkAction : PhotoAction
     {
         public override PhotoActionKind Action { get => PhotoActionKind.Watermark; }
         public required string WatermarkImagePath { get; set; }
-        public int QuadValue { private get; set; }
+        public int QuadValue { get; set; }
         public ImageUtils.Quad Quad
         {
             get

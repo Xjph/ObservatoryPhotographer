@@ -48,7 +48,7 @@ namespace Observatory.Photographer
 
         PluginUI IObservatoryPlugin.PluginUI => _pluginUI;
 
-        object IObservatoryPlugin.Settings { get => _settings; set => _settings = (PhotoSettings)value; }
+        public object Settings { get => _settings; set => _settings = (PhotoSettings)value; }
 
         void IObservatoryWorker.JournalEvent<TJournal>(TJournal journal)
         {
@@ -56,6 +56,9 @@ namespace Observatory.Photographer
             {
                 case Screenshot screenshot:
                     _photographer?.HandleScreenshot(screenshot);
+                    break;
+                case LoadGame loadGame:
+                    CmdrName = loadGame.Commander;
                     break;
             }
         }
@@ -68,6 +71,11 @@ namespace Observatory.Photographer
         void IObservatoryPlugin.Load(IObservatoryCore observatoryCore)
         {
             _photographer = new(observatoryCore, this, _mainPanel, _settings);
+            _mainPanel.Core = observatoryCore;
+            _mainPanel.Worker = this;
+            _mainPanel.Photographer = _photographer;
         }
+
+        internal string CmdrName { get; set; } = "CMDR";
     }
 }
