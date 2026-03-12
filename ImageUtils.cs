@@ -450,7 +450,22 @@ namespace Observatory.Photographer
             var filename = FillTokenizedString(action.FilePattern, imageData, action.CmdrName);
             var sanitizedCharacters = filename.Where(c => !Path.GetInvalidFileNameChars().Contains(c)).ToArray();
             filename = new string(sanitizedCharacters);
-          
+
+            var (extension, validExtensions) = action.Format switch
+            {
+                MagickFormat.Jpeg => (".jpg", new string[] { ".jpg", ".jpeg", ".jpe", ".jfif" }),
+                MagickFormat.Png => (".png", [".png"]),
+                MagickFormat.Heic => (".heic", [".heic", ".heif"]),
+                MagickFormat.WebP => (".webp", [".webp"]),
+                MagickFormat.Bmp => (".bmp", [ ".bmp", ".dib" ]),
+                _ => throw new ArgumentException("Unsupported format")
+            };
+
+            if (!validExtensions.Any(ext => filename.EndsWith(ext, StringComparison.OrdinalIgnoreCase)))
+            {
+                filename += extension;
+            }
+
             var fullPath = action.FolderPath + Path.DirectorySeparatorChar + filename;
 
             image.Write(fullPath);
