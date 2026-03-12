@@ -24,6 +24,7 @@
                 // Override theme
                 // Using text color to indicate good path
                 PathTextbox.BackColor = Color.White;
+                PopulateQuads();
                 LoadAction();
             }
         }
@@ -31,6 +32,12 @@
         private void LoadAction()
         {
             PathTextbox.Text = WatermarkAction.WatermarkImagePath;
+            QuadOrderCheckbox.Checked = WatermarkAction.SecondOrder;
+            AutoOrderCheckbox.Checked = WatermarkAction.SecondOrder;
+            LocationQuadDropdown.SelectedIndex = WatermarkAction.QuadValue;
+            LocationRelativeCheckbox.Checked = WatermarkAction.Relative;
+            LocationXSpinner.Value = WatermarkAction.Location.X;
+            LocationYSpinner.Value = WatermarkAction.Location.Y;
             switch (WatermarkAction.LocationMethod)
             {
                 case LocationMethod.Automatic:
@@ -43,9 +50,44 @@
                     LocationSpecificRadio.Checked = true;
                     break;
             }
-            LocationQuadDropdown.SelectedIndex = WatermarkAction.QuadValue;
-            LocationXSpinner.Value = WatermarkAction.Location.X;
-            LocationYSpinner.Value = WatermarkAction.Location.Y;
+        }
+
+        private void PopulateQuads()
+        {
+            LocationQuadDropdown.Items.Clear();
+            int prevIndex = LocationQuadDropdown.SelectedIndex;
+            if (QuadOrderCheckbox.Checked)
+            {
+                LocationQuadDropdown.Items.AddRange([
+                    "Top-Left Of Top-Left",
+                    "Top-Right Of Top-Left",
+                    "Bottom-Left Of Top-Left",
+                    "Bottom-Right Of Top-Left",
+                    "Top-Left Of Top-Right",
+                    "Top-Right Of Top-Right",
+                    "Bottom-Left Of Top-Right",
+                    "Bottom-Right Of Top-Right",
+                    "Top-Left Of Bottom-Left",
+                    "Top-Right Of Bottom-Left",
+                    "Bottom-Left Of Bottom-Left",
+                    "Bottom-Right Of Bottom-Left",
+                    "Top-Left Of Bottom-Right",
+                    "Top-Right Of Bottom-Right",
+                    "Bottom-Left Of Bottom-Right",
+                    "Bottom-Right Of Bottom-Right"
+                    ]);
+                LocationQuadDropdown.SelectedIndex = prevIndex * 4;
+            }
+            else
+            {
+                LocationQuadDropdown.Items.AddRange([
+                    "Top-Left",
+                    "Top-Right",
+                    "Bottom-Left",
+                    "Bottom-Right"
+                    ]);
+                LocationQuadDropdown.SelectedIndex = prevIndex / 4;
+            }
         }
 
         private void BrowseButton_Click(object sender, EventArgs e)
@@ -90,6 +132,17 @@
                 LocationMethod.Manual;
         }
 
+        private void QuadOrderCheckbox_CheckedChanged(object sender, EventArgs e)
+        {
+            PopulateQuads();
+            WatermarkAction.SecondOrder = QuadOrderCheckbox.Checked;
+        }
+
+        private void AutoOrderCheckbox_CheckedChanged(object sender, EventArgs e)
+        {
+            WatermarkAction.SecondOrder = AutoOrderCheckbox.Checked;
+        }
+
         private void PathTextbox_TextChanged(object sender, EventArgs e)
         {
             if (File.Exists(PathTextbox.Text))
@@ -103,6 +156,28 @@
                 PathTextbox.Font = new Font(PathTextbox.Font, FontStyle.Bold);
                 PathTextbox.ForeColor = Color.Red;
             }
+        }
+
+        private void LocationRelativeCheckbox_CheckedChanged(object sender, EventArgs e)
+        {
+            LocationXLabel.Text = LocationRelativeCheckbox.Checked ? "%" : "px";
+            LocationYLabel.Text = LocationRelativeCheckbox.Checked ? "%" : "px";
+            WatermarkAction.Relative = LocationRelativeCheckbox.Checked;
+        }
+
+        private void LocationQuadDropdown_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            WatermarkAction.QuadValue = LocationQuadDropdown.SelectedIndex;
+        }
+
+        private void LocationXSpinner_ValueChanged(object sender, EventArgs e)
+        {
+            WatermarkAction.Location = new((int)LocationXSpinner.Value, WatermarkAction.Location.Y);
+        }
+
+        private void LocationYSpinner_ValueChanged(object sender, EventArgs e)
+        {
+            WatermarkAction.Location = new(WatermarkAction.Location.X, (int)LocationYSpinner.Value);
         }
 
         private void OkButton_Click(object sender, EventArgs e)
