@@ -94,7 +94,7 @@
             if (result == DialogResult.OK)
             {
                 FontSampleLabel.Text = FontDialog.Font.Name;
-                FontSampleLabel.Font = FontDialog.Font;
+                FontSampleLabel.Font = new(FontDialog.Font.FontFamily, FontSampleLabel.Font.Size, FontDialog.Font.Style);
                 CaptionAction.Font = FontDialog.Font;
             }
         }
@@ -150,6 +150,25 @@
         private void LocationYSpinner_ValueChanged(object sender, EventArgs e)
         {
             CaptionAction.Location = new(CaptionAction.Location.X, (int)LocationYSpinner.Value);
+        }
+
+        private void FontColourButton_Click(object sender, EventArgs e)
+        {
+            var colourPicker = new ColorDialog();
+            var mColourR = CaptionAction.Color.R;
+            var mColourG = CaptionAction.Color.G;
+            var mColourB = CaptionAction.Color.B;
+            var mColourA = CaptionAction.Color.A;
+            colourPicker.Color = Color.FromArgb(mColourA, mColourR, mColourG, mColourB);
+            var result = colourPicker.ShowDialog();
+            if (result == DialogResult.OK)
+            {
+                CaptionAction.Color.R = colourPicker.Color.R;
+                CaptionAction.Color.G = colourPicker.Color.G;
+                CaptionAction.Color.B = colourPicker.Color.B;
+                CaptionAction.Color.A = colourPicker.Color.A;
+                FontSampleLabel.ForeColor = colourPicker.Color;
+            }
         }
     }
 }

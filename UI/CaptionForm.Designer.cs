@@ -127,7 +127,7 @@
             LocationXLabel.AutoSize = true;
             LocationXLabel.Location = new Point(98, 178);
             LocationXLabel.Name = "LocationXLabel";
-            LocationXLabel.Size = new Size(13, 15);
+            LocationXLabel.Size = new Size(12, 15);
             LocationXLabel.TabIndex = 9;
             LocationXLabel.Text = "x";
             // 
@@ -185,7 +185,7 @@
             LocationQuadRadio.AutoSize = true;
             LocationQuadRadio.Location = new Point(6, 72);
             LocationQuadRadio.Name = "LocationQuadRadio";
-            LocationQuadRadio.Size = new Size(106, 19);
+            LocationQuadRadio.Size = new Size(105, 19);
             LocationQuadRadio.TabIndex = 3;
             LocationQuadRadio.TabStop = true;
             LocationQuadRadio.Text = "Fixed Quadrant";
@@ -197,7 +197,7 @@
             AutoOrderCheckbox.AutoSize = true;
             AutoOrderCheckbox.Location = new Point(24, 47);
             AutoOrderCheckbox.Name = "AutoOrderCheckbox";
-            AutoOrderCheckbox.Size = new Size(73, 19);
+            AutoOrderCheckbox.Size = new Size(74, 19);
             AutoOrderCheckbox.TabIndex = 2;
             AutoOrderCheckbox.Text = "Two Pass";
             AutoOrderCheckbox.UseVisualStyleBackColor = true;
@@ -225,6 +225,7 @@
             FontColourButton.TabIndex = 4;
             FontColourButton.Text = "Change Colour";
             FontColourButton.UseVisualStyleBackColor = true;
+            FontColourButton.Click += FontColourButton_Click;
             // 
             // OkButton
             // 
