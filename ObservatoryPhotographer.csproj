@@ -1,27 +1,32 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0-windows7.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-	<UseWindowsForms>true</UseWindowsForms>
-	<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-	<AssemblyName>ObservatoryPhotographer</AssemblyName>
-	<PlatformTarget>x64</PlatformTarget>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net8.0-windows7.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<UseWindowsForms>true</UseWindowsForms>
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+		<AssemblyName>ObservatoryPhotographer</AssemblyName>
+		<PlatformTarget>x64</PlatformTarget>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Magick.NET-Q8-x64" Version="14.10.2" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Magick.NET-Q8-x64" Version="14.11.0" />
+	</ItemGroup>
 
 	<PropertyGroup>
 		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 	</PropertyGroup>
 
-  <ItemGroup>
-    <Reference Include="ObservatoryFramework">
-      <HintPath>..\ObservatoryCore\ObservatoryFramework\bin\Release\net8.0\ObservatoryFramework.dll</HintPath>
-    </Reference>
-  </ItemGroup>
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+		<Exec Condition=" '$(OS)' == 'Windows_NT' " Command="powershell -command &quot;Get-ChildItem -Path '$(TargetDir)runtimes' -Directory -Exclude 'win-x64' | Remove-Item -Recurse -Force&quot;" />
+		<Exec Condition=" '$(OS)' == 'Windows_NT' " Command="xcopy &quot;$(TargetDir)*&quot; &quot;$(ProjectDir)..\ObservatoryCore\ObservatoryCore\$(OutDir)plugins\ObservatoryPhotographer\&quot; /y /s /exclude:$(ProjectDir)xcopyExclude" />
+	</Target>
+	
+	<ItemGroup>
+		<Reference Include="ObservatoryFramework">
+			<HintPath>..\ObservatoryCore\ObservatoryFramework\bin\Release\net8.0\ObservatoryFramework.dll</HintPath>
+		</Reference>
+	</ItemGroup>
 
 </Project>
