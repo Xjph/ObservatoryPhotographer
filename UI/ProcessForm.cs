@@ -145,7 +145,13 @@ namespace Observatory.Photographer.UI
 
         private void OkButton_Click(object sender, EventArgs e)
         {
-            ImageUtils.PerformPhotoActions(BuildActionList(), _image);
+            ProcessingLabel.BringToFront();
+            ProcessingLabel.Enabled = true;
+            ProcessingLabel.Visible = true;
+            Task.Run(() => {
+                ImageUtils.PerformPhotoActions(BuildActionList(), _image);
+                _core?.ExecuteOnUIThread(() => Close());
+            });
         }
 
         private void SaveButton_Click(object sender, EventArgs e)

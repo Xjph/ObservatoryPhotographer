@@ -32,7 +32,7 @@
             ConvertDropdown = new ComboBox();
             ResizeFixed = new RadioButton();
             ResizeScale = new RadioButton();
-            panel1 = new Panel();
+            ResizePanel = new Panel();
             PercentLabel = new Label();
             ResizePercentSpinner = new NumericUpDown();
             ResizeYSpinner = new NumericUpDown();
@@ -54,8 +54,9 @@
             FilenameTextbox = new TextBox();
             ExampleBox = new GroupBox();
             ExampleLabel = new Label();
-            label1 = new Label();
-            panel1.SuspendLayout();
+            FormatLabel = new Label();
+            ProcessingLabel = new Label();
+            ResizePanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)ResizePercentSpinner).BeginInit();
             ((System.ComponentModel.ISupportInitialize)ResizeYSpinner).BeginInit();
             ((System.ComponentModel.ISupportInitialize)ResizeXSpinner).BeginInit();
@@ -110,20 +111,20 @@
             ResizeScale.UseVisualStyleBackColor = true;
             ResizeScale.CheckedChanged += ResizeScale_CheckedChanged;
             // 
-            // panel1
+            // ResizePanel
             // 
-            panel1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            panel1.Controls.Add(PercentLabel);
-            panel1.Controls.Add(ResizePercentSpinner);
-            panel1.Controls.Add(ResizeYSpinner);
-            panel1.Controls.Add(xLabel);
-            panel1.Controls.Add(ResizeXSpinner);
-            panel1.Controls.Add(ResizeFixed);
-            panel1.Controls.Add(ResizeScale);
-            panel1.Location = new Point(12, 55);
-            panel1.Name = "panel1";
-            panel1.Size = new Size(298, 55);
-            panel1.TabIndex = 5;
+            ResizePanel.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            ResizePanel.Controls.Add(PercentLabel);
+            ResizePanel.Controls.Add(ResizePercentSpinner);
+            ResizePanel.Controls.Add(ResizeYSpinner);
+            ResizePanel.Controls.Add(xLabel);
+            ResizePanel.Controls.Add(ResizeXSpinner);
+            ResizePanel.Controls.Add(ResizeFixed);
+            ResizePanel.Controls.Add(ResizeScale);
+            ResizePanel.Location = new Point(12, 55);
+            ResizePanel.Name = "ResizePanel";
+            ResizePanel.Size = new Size(298, 55);
+            ResizePanel.TabIndex = 5;
             // 
             // PercentLabel
             // 
@@ -253,7 +254,7 @@
             CancelBtn.Name = "CancelBtn";
             CancelBtn.Size = new Size(72, 23);
             CancelBtn.TabIndex = 13;
-            CancelBtn.Text = "Cancel";
+            CancelBtn.Text = "Close";
             CancelBtn.UseVisualStyleBackColor = true;
             CancelBtn.Click += CancelBtn_Click;
             // 
@@ -344,21 +345,34 @@
             ExampleLabel.TabIndex = 0;
             ExampleLabel.Text = "Filename Example Text";
             // 
-            // label1
+            // FormatLabel
             // 
-            label1.AutoSize = true;
-            label1.Location = new Point(12, 13);
-            label1.Name = "label1";
-            label1.Size = new Size(45, 15);
-            label1.TabIndex = 21;
-            label1.Text = "Format";
+            FormatLabel.AutoSize = true;
+            FormatLabel.Location = new Point(12, 13);
+            FormatLabel.Name = "FormatLabel";
+            FormatLabel.Size = new Size(45, 15);
+            FormatLabel.TabIndex = 21;
+            FormatLabel.Text = "Format";
+            // 
+            // ProcessingLabel
+            // 
+            ProcessingLabel.BorderStyle = BorderStyle.FixedSingle;
+            ProcessingLabel.Dock = DockStyle.Fill;
+            ProcessingLabel.Enabled = false;
+            ProcessingLabel.Location = new Point(0, 0);
+            ProcessingLabel.Name = "ProcessingLabel";
+            ProcessingLabel.Size = new Size(324, 531);
+            ProcessingLabel.TabIndex = 22;
+            ProcessingLabel.Text = "Processing...";
+            ProcessingLabel.TextAlign = ContentAlignment.MiddleCenter;
+            ProcessingLabel.Visible = false;
             // 
             // ProcessForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(324, 531);
-            Controls.Add(label1);
+            Controls.Add(FormatLabel);
             Controls.Add(ExampleBox);
             Controls.Add(FilenameTextbox);
             Controls.Add(FilenameLink);
@@ -375,14 +389,15 @@
             Controls.Add(QualitySpinner);
             Controls.Add(QualityLabel);
             Controls.Add(ResizeCheckbox);
-            Controls.Add(panel1);
+            Controls.Add(ResizePanel);
             Controls.Add(ConvertDropdown);
+            Controls.Add(ProcessingLabel);
             FormBorderStyle = FormBorderStyle.SizableToolWindow;
             MinimumSize = new Size(340, 360);
             Name = "ProcessForm";
             Text = "Process Image";
-            panel1.ResumeLayout(false);
-            panel1.PerformLayout();
+            ResizePanel.ResumeLayout(false);
+            ResizePanel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)ResizePercentSpinner).EndInit();
             ((System.ComponentModel.ISupportInitialize)ResizeYSpinner).EndInit();
             ((System.ComponentModel.ISupportInitialize)ResizeXSpinner).EndInit();
@@ -398,7 +413,7 @@
         private ComboBox ConvertDropdown;
         private RadioButton ResizeFixed;
         private RadioButton ResizeScale;
-        private Panel panel1;
+        private Panel ResizePanel;
         private Label QualityLabel;
         private NumericUpDown QualitySpinner;
         private Label PercentLabel;
@@ -420,6 +435,7 @@
         private TextBox FilenameTextbox;
         private GroupBox ExampleBox;
         private Label ExampleLabel;
-        private Label label1;
+        private Label FormatLabel;
+        private Label ProcessingLabel;
     }
 }
