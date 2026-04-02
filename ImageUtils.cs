@@ -321,14 +321,14 @@ namespace Observatory.Photographer
                 { "guifocus", metadata.Status?.GuiFocus.ToString() ?? string.Empty },
                 { "balance", metadata.Status?.Balance.ToString() ?? string.Empty },
                 { "cargo", metadata.Status?.Cargo.ToString("N0") ?? string.Empty },
-                { "mainfuel", metadata.Status?.Fuel.FuelMain.ToString("N1") ?? string.Empty },
+                { "mainfuel", metadata.Status?.Fuel?.FuelMain.ToString("N1") ?? string.Empty },
                 {
                     "reservoirfuel",
-                    metadata.Status?.Fuel.FuelReservoir.ToString("N1") ?? string.Empty
+                    metadata.Status?.Fuel?.FuelReservoir.ToString("N1") ?? string.Empty
                 },
                 { "health", (metadata.Status?.Health * 100)?.ToString("N0") ?? string.Empty },
                 { "oxygen", (metadata.Status?.Oxygen * 100)?.ToString("N0") ?? string.Empty },
-                { "destination", metadata.Status?.Destination.Name ?? string.Empty },
+                { "destination", metadata.Status?.Destination?.Name ?? string.Empty },
                 { "gravity-g", metadata.Status?.Gravity.ToString("N2") ?? string.Empty },
                 {
                     "gravity-mps2",
