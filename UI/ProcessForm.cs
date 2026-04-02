@@ -22,8 +22,19 @@ namespace Observatory.Photographer.UI
             _image = metadata;
             _captionAction = new() { Font = Font, CmdrName = worker?.CmdrName ?? "CMDR" };
             _watermarkAction = new() { WatermarkImagePath = string.Empty };
-            _saveAction = new() { Format = MagickFormat.Png, FolderPath = ((PhotoSettings)worker.Settings).OutputLocationPath, FilePattern = "image", CmdrName = worker?.CmdrName ?? "CMDR" };
-            _resizeAction = new() { X = 100, Y = 100, Relative = true };
+            _saveAction = new()
+            {
+                Format = MagickFormat.Png,
+                FolderPath = ((PhotoSettings)worker.Settings).OutputLocationPath,
+                FilePattern = "image",
+                CmdrName = worker?.CmdrName ?? "CMDR",
+            };
+            _resizeAction = new()
+            {
+                X = 100,
+                Y = 100,
+                Relative = true,
+            };
             _captionForm = new(_captionAction);
             _watermarkForm = new(_watermarkAction);
             _metaAction = new();
@@ -50,8 +61,6 @@ namespace Observatory.Photographer.UI
 
             foreach (var action in actionList)
             {
-
-
                 switch (action)
                 {
                     case SaveAction saveAction:
@@ -61,7 +70,8 @@ namespace Observatory.Photographer.UI
                         {
                             case MagickFormat.Jpeg:
                                 ConvertDropdown.SelectedItem = "JPEG";
-                                QualitySpinner.Value = saveAction.Quality > 0 ? saveAction.Quality : 85;
+                                QualitySpinner.Value =
+                                    saveAction.Quality > 0 ? saveAction.Quality : 85;
                                 QualitySpinner.Visible = true;
                                 break;
                             case MagickFormat.Png:
@@ -71,12 +81,14 @@ namespace Observatory.Photographer.UI
                                 break;
                             case MagickFormat.Heic:
                                 ConvertDropdown.SelectedItem = "HEIC";
-                                QualitySpinner.Value = saveAction.Quality > 0 ? saveAction.Quality : 85;
+                                QualitySpinner.Value =
+                                    saveAction.Quality > 0 ? saveAction.Quality : 85;
                                 QualitySpinner.Visible = true;
                                 break;
                             case MagickFormat.WebP:
                                 ConvertDropdown.SelectedItem = "WEBP";
-                                QualitySpinner.Value = saveAction.Quality > 0 ? saveAction.Quality : 85;
+                                QualitySpinner.Value =
+                                    saveAction.Quality > 0 ? saveAction.Quality : 85;
                                 QualitySpinner.Visible = true;
                                 break;
                             case MagickFormat.Bmp:
@@ -117,7 +129,8 @@ namespace Observatory.Photographer.UI
             }
 
             if (FilenameTextbox.Text.Trim() == string.Empty)
-                FilenameTextbox.Text = "{}-{}-{}";
+                FilenameTextbox.Text = "{timestamp}-{system}";
+            ConvertDropdown.SelectedItem ??= "PNG";
         }
 
         private void CaptionButton_Click(object sender, EventArgs e)
@@ -259,91 +272,96 @@ namespace Observatory.Photographer.UI
         private void FilenameTextbox_TextChanged(object sender, EventArgs e)
         {
             _saveAction.FilePattern = FilenameTextbox.Text;
-            ExampleLabel.Text = ImageUtils.FillTokenizedString(FilenameTextbox.Text, _image, _saveAction.CmdrName);
+            ExampleLabel.Text = ImageUtils.FillTokenizedString(
+                FilenameTextbox.Text,
+                _image,
+                _saveAction.CmdrName
+            );
         }
 
         private void FilenameLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             MessageBox.Show(
-                "SCREENSHOT PROPERTIES:\n" +
-                "{cmdr} - Commander name\n" +
-                "{latitude} - Latitude coordinate\n" +
-                "{longitude} - Longitude coordinate\n" +
-                "{system} - System name\n" +
-                "{body} - Body name\n" +
-                "{altitude} - Altitude\n" +
-                "{heading} - Heading direction\n" +
-                "{timestamp} - ISO timestamp (YYYY-MM-DDTHH-MM-SS)\n" +
-                "{timestamp:FORMAT} - Custom formatted timestamp\n\n" +
-                "STATUS PROPERTIES (Not always available):\n" +
-                "{guifocus} - Current GUI focus\n" +
-                "{balance} - Credit balance\n" +
-                "{cargo} - Cargo amount\n" +
-                "{mainfuel} - Main fuel level\n" +
-                "{reservoirfuel} - Reservoir fuel level\n" +
-                "{health} - Health percentage\n" +
-                "{oxygen} - Oxygen percentage\n" +
-                "{destination} - Destination name\n" +
-                "{gravity-g} - Gravity in G\n" +
-                "{gravity-mps2} - Gravity in m/s²\n" +
-                "{legalstate} - Legal state\n" +
-                "{radius} - Planet radius in km\n" +
-                "{temperature} - Temperature\n" +
-                "{hud} - HUD mode (Analysis/Combat)\n" +
-                "{docked} - Docked/Undocked\n" +
-                "{landed} - Landed/In Flight\n" +
-                "{landinggear} - Landing gear (Down/Raised)\n" +
-                "{shields} - Shields (Up/Down)\n" +
-                "{supercruise} - Supercruise/Normal Space\n" +
-                "{faoff} - Flight assist (On/Off)\n" +
-                "{hardpoints} - Hardpoints (Deployed/Retracted)\n" +
-                "{wing} - Wing/Solo\n" +
-                "{lights} - Lights (On/Off)\n" +
-                "{cargoscoop} - Cargo scoop (Deployed/Retracted)\n" +
-                "{silentrunning} - Silent running status\n" +
-                "{fuelscooping} - Fuel scooping status\n" +
-                "{srvbrake} - SRV brake (On/Off)\n" +
-                "{srvturret} - SRV turret (Active/Fixed)\n" +
-                "{srvproximity} - SRV proximity (Close/Clear)\n" +
-                "{srvdriveassist} - SRV drive assist (On/Off)\n" +
-                "{masslock} - Mass lock status\n" +
-                "{fsdcharging} - FSD charging/idle\n" +
-                "{fsdcooldown} - FSD cooldown/ready\n" +
-                "{lowfuel} - Low fuel warning\n" +
-                "{overheat} - Overheat warning\n" +
-                "{latlongvalid} - Lat/Long validity\n" +
-                "{indanger} - In danger status\n" +
-                "{interdiction} - Interdiction status\n" +
-                "{mainship} - In main ship\n" +
-                "{fighter} - In fighter\n" +
-                "{srv} - In SRV\n" +
-                "{nightvision} - Night vision (On/Off)\n" +
-                "{radialaltitude} - Altitude mode (Radial/Terrain)\n" +
-                "{fsdjump} - FSD jumping status\n" +
-                "{srvhighbeam} - SRV high beam (On/Off)\n" +
-                "{onfoot} - On foot status\n" +
-                "{intaxi} - In taxi status\n" +
-                "{inmulticrew} - In multicrew\n" +
-                "{onfootinstation} - On foot in station\n" +
-                "{onfootonplanet} - On foot on planet\n" +
-                "{aimdownsight} - Aiming down sight\n" +
-                "{lowoxygen} - Low oxygen warning\n" +
-                "{lowhealth} - Low health warning\n" +
-                "{cold} - Cold status\n" +
-                "{hot} - Hot status\n" +
-                "{verycold} - Very cold status\n" +
-                "{veryhot} - Very hot status\n" +
-                "{glidemode} - Gliding status\n" +
-                "{onfootinhangar} - On foot in hangar\n" +
-                "{onfootinsocialspace} - On foot in social space\n" +
-                "{onfootexterior} - On foot exterior\n" +
-                "{breathableatmosphere} - Breathable atmosphere\n" +
-                "{telepresencemulticrew} - Telepresence multicrew\n" +
-                "{physicalmulticrew} - Physical multicrew\n" +
-                "{fsdhyperdrivecharging} - FSD hyperdrive charging",
-                "Image Metadata Tokens", 
-                MessageBoxButtons.OK, 
-                MessageBoxIcon.Information);
+                "SCREENSHOT PROPERTIES:\n"
+                    + "{cmdr} - Commander name\n"
+                    + "{latitude} - Latitude coordinate\n"
+                    + "{longitude} - Longitude coordinate\n"
+                    + "{system} - System name\n"
+                    + "{body} - Body name\n"
+                    + "{altitude} - Altitude\n"
+                    + "{heading} - Heading direction\n"
+                    + "{timestamp} - ISO timestamp (YYYY-MM-DDTHH-MM-SS)\n"
+                    + "{timestamp:FORMAT} - Custom formatted timestamp\n\n"
+                    + "STATUS PROPERTIES (Not always available):\n"
+                    + "{guifocus} - Current GUI focus\n"
+                    + "{balance} - Credit balance\n"
+                    + "{cargo} - Cargo amount\n"
+                    + "{mainfuel} - Main fuel level\n"
+                    + "{reservoirfuel} - Reservoir fuel level\n"
+                    + "{health} - Health percentage\n"
+                    + "{oxygen} - Oxygen percentage\n"
+                    + "{destination} - Destination name\n"
+                    + "{gravity-g} - Gravity in G\n"
+                    + "{gravity-mps2} - Gravity in m/s²\n"
+                    + "{legalstate} - Legal state\n"
+                    + "{radius} - Planet radius in km\n"
+                    + "{temperature} - Temperature\n"
+                    + "{hud} - HUD mode (Analysis/Combat)\n"
+                    + "{docked} - Docked/Undocked\n"
+                    + "{landed} - Landed/In Flight\n"
+                    + "{landinggear} - Landing gear (Down/Raised)\n"
+                    + "{shields} - Shields (Up/Down)\n"
+                    + "{supercruise} - Supercruise/Normal Space\n"
+                    + "{faoff} - Flight assist (On/Off)\n"
+                    + "{hardpoints} - Hardpoints (Deployed/Retracted)\n"
+                    + "{wing} - Wing/Solo\n"
+                    + "{lights} - Lights (On/Off)\n"
+                    + "{cargoscoop} - Cargo scoop (Deployed/Retracted)\n"
+                    + "{silentrunning} - Silent running status\n"
+                    + "{fuelscooping} - Fuel scooping status\n"
+                    + "{srvbrake} - SRV brake (On/Off)\n"
+                    + "{srvturret} - SRV turret (Active/Fixed)\n"
+                    + "{srvproximity} - SRV proximity (Close/Clear)\n"
+                    + "{srvdriveassist} - SRV drive assist (On/Off)\n"
+                    + "{masslock} - Mass lock status\n"
+                    + "{fsdcharging} - FSD charging/idle\n"
+                    + "{fsdcooldown} - FSD cooldown/ready\n"
+                    + "{lowfuel} - Low fuel warning\n"
+                    + "{overheat} - Overheat warning\n"
+                    + "{latlongvalid} - Lat/Long validity\n"
+                    + "{indanger} - In danger status\n"
+                    + "{interdiction} - Interdiction status\n"
+                    + "{mainship} - In main ship\n"
+                    + "{fighter} - In fighter\n"
+                    + "{srv} - In SRV\n"
+                    + "{nightvision} - Night vision (On/Off)\n"
+                    + "{radialaltitude} - Altitude mode (Radial/Terrain)\n"
+                    + "{fsdjump} - FSD jumping status\n"
+                    + "{srvhighbeam} - SRV high beam (On/Off)\n"
+                    + "{onfoot} - On foot status\n"
+                    + "{intaxi} - In taxi status\n"
+                    + "{inmulticrew} - In multicrew\n"
+                    + "{onfootinstation} - On foot in station\n"
+                    + "{onfootonplanet} - On foot on planet\n"
+                    + "{aimdownsight} - Aiming down sight\n"
+                    + "{lowoxygen} - Low oxygen warning\n"
+                    + "{lowhealth} - Low health warning\n"
+                    + "{cold} - Cold status\n"
+                    + "{hot} - Hot status\n"
+                    + "{verycold} - Very cold status\n"
+                    + "{veryhot} - Very hot status\n"
+                    + "{glidemode} - Gliding status\n"
+                    + "{onfootinhangar} - On foot in hangar\n"
+                    + "{onfootinsocialspace} - On foot in social space\n"
+                    + "{onfootexterior} - On foot exterior\n"
+                    + "{breathableatmosphere} - Breathable atmosphere\n"
+                    + "{telepresencemulticrew} - Telepresence multicrew\n"
+                    + "{physicalmulticrew} - Physical multicrew\n"
+                    + "{fsdhyperdrivecharging} - FSD hyperdrive charging",
+                "Image Metadata Tokens",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information
+            );
         }
     }
 }

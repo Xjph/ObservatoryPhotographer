@@ -71,8 +71,8 @@
                     "Top-Left Of Bottom-Right",
                     "Top-Right Of Bottom-Right",
                     "Bottom-Left Of Bottom-Right",
-                    "Bottom-Right Of Bottom-Right"
-                    ]);
+                    "Bottom-Right Of Bottom-Right",
+                ]);
                 LocationQuadDropdown.SelectedIndex = prevIndex * 4;
             }
             else
@@ -81,11 +81,10 @@
                     "Top-Left",
                     "Top-Right",
                     "Bottom-Left",
-                    "Bottom-Right"
-                    ]);
+                    "Bottom-Right",
+                ]);
                 LocationQuadDropdown.SelectedIndex = prevIndex / 4;
             }
-
         }
 
         private void FontButton_Click(object sender, EventArgs e)
@@ -94,7 +93,11 @@
             if (result == DialogResult.OK)
             {
                 FontSampleLabel.Text = FontDialog.Font.Name;
-                FontSampleLabel.Font = new(FontDialog.Font.FontFamily, FontSampleLabel.Font.Size, FontDialog.Font.Style);
+                FontSampleLabel.Font = new(
+                    FontDialog.Font.FontFamily,
+                    FontSampleLabel.Font.Size,
+                    FontDialog.Font.Style
+                );
                 CaptionAction.Font = FontDialog.Font;
             }
         }
@@ -109,9 +112,9 @@
             LocationRelativeCheckbox.Enabled = LocationSpecificRadio.Checked;
 
             CaptionAction.LocationMethod =
-                AutomaticLocationRadio.Checked ? LocationMethod.Automatic :
-                LocationQuadRadio.Checked ? LocationMethod.Quadrant :
-                LocationMethod.Manual;
+                AutomaticLocationRadio.Checked ? LocationMethod.Automatic
+                : LocationQuadRadio.Checked ? LocationMethod.Quadrant
+                : LocationMethod.Manual;
         }
 
         private void QuadOrderCheckbox_CheckedChanged(object sender, EventArgs e)

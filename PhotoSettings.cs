@@ -18,10 +18,10 @@ namespace Observatory.Photographer
 
         [SettingDisplayName("Screenshot Location")]
         [System.Text.Json.Serialization.JsonIgnore]
-        public DirectoryInfo ScreenshotLocation 
-        { 
-            get => new(ScreenshotLocationPath); 
-            set => ScreenshotLocationPath = value.FullName; 
+        public DirectoryInfo ScreenshotLocation
+        {
+            get => new(ScreenshotLocationPath);
+            set => ScreenshotLocationPath = value.FullName;
         }
 
         [SettingDisplayName("Output Folder")]
@@ -33,12 +33,12 @@ namespace Observatory.Photographer
         }
 
         [SettingIgnore]
-        public string ScreenshotLocationPath { get; set; }
+        public required string ScreenshotLocationPath { get; set; }
 
         [SettingIgnore]
-        public string OutputLocationPath { get; set; }
+        public required string OutputLocationPath { get; set; }
 
         [SettingIgnore]
-        public object[] SavedActions { get; set; }
+        public object[] SavedActions { get; set; } = [];
     }
 }

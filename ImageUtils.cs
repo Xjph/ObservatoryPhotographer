@@ -1,4 +1,7 @@
-﻿using ImageMagick;
+﻿using System;
+using System.Text;
+using System.Text.Json;
+using ImageMagick;
 using ImageMagick.Drawing;
 using Observatory.Framework.Files.ParameterTypes;
 
@@ -11,7 +14,7 @@ namespace Observatory.Photographer
             TopLeft = 0,
             TopRight = 1,
             BottomLeft = 2,
-            BottomRight = 3
+            BottomRight = 3,
         }
 
         public enum SecondOrderQuad
@@ -31,7 +34,7 @@ namespace Observatory.Photographer
             TopLeftOfBottomRight = 12,
             TopRightOfBottomRight = 13,
             BottomLeftOfBottomRight = 14,
-            BottomRightOfBottomRight = 15
+            BottomRightOfBottomRight = 15,
         }
 
         private static Rectangle GetBoundsFromQuad(MagickImage image, int quad, bool secondOrder)
@@ -78,9 +81,12 @@ namespace Observatory.Photographer
             return new Rectangle(x, y, width, height);
         }
 
-        public static void PerformPhotoActions(List<PhotoAction> actions, ImageWithMetadata imageData)
+        public static void PerformPhotoActions(
+            IEnumerable<PhotoAction> actions,
+            ImageWithMetadata imageData
+        )
         {
-            if (actions.Count == 0 || actions.Last().Action != PhotoActionKind.Save) 
+            if (!actions.Any() || actions.Last().Action != PhotoActionKind.Save)
                 throw new ArgumentException("Final Action Must Be SaveAction");
 
             bool embedMeta = false;
@@ -109,74 +115,190 @@ namespace Observatory.Photographer
             }
         }
 
-        public static string FillTokenizedString(string tokenizedString, ImageWithMetadata metadata, string cmdrName = "")
+        public static string FillTokenizedString(
+            string tokenizedString,
+            ImageWithMetadata metadata,
+            string cmdrName = ""
+        )
         {
             string resolveFlag(Framework.Files.Status? status, StatusFlags flag)
             {
-                if (status is null) return string.Empty;
+                if (status is null)
+                    return string.Empty;
                 return flag switch
                 {
-                    StatusFlags.Docked => status.Flags.HasFlag(StatusFlags.Docked) ? "Docked" : "Undocked",
-                    StatusFlags.Landed => status.Flags.HasFlag(StatusFlags.Landed) ? "Landed" : "In Flight",
-                    StatusFlags.LandingGear => status.Flags.HasFlag(StatusFlags.LandingGear) ? "Down" : "Raised",
-                    StatusFlags.Shields => status.Flags.HasFlag(StatusFlags.Shields) ? "Up" : "Down",
-                    StatusFlags.Supercruise => status.Flags.HasFlag(StatusFlags.Supercruise) ? "Supercruise" : "Normal Space",
+                    StatusFlags.Docked => status.Flags.HasFlag(StatusFlags.Docked)
+                        ? "Docked"
+                        : "Undocked",
+                    StatusFlags.Landed => status.Flags.HasFlag(StatusFlags.Landed)
+                        ? "Landed"
+                        : "In Flight",
+                    StatusFlags.LandingGear => status.Flags.HasFlag(StatusFlags.LandingGear)
+                        ? "Down"
+                        : "Raised",
+                    StatusFlags.Shields => status.Flags.HasFlag(StatusFlags.Shields)
+                        ? "Up"
+                        : "Down",
+                    StatusFlags.Supercruise => status.Flags.HasFlag(StatusFlags.Supercruise)
+                        ? "Supercruise"
+                        : "Normal Space",
                     StatusFlags.FAOff => status.Flags.HasFlag(StatusFlags.FAOff) ? "Off" : "On",
-                    StatusFlags.Hardpoints => status.Flags.HasFlag(StatusFlags.Hardpoints) ? "Deployed" : "Retracted",
+                    StatusFlags.Hardpoints => status.Flags.HasFlag(StatusFlags.Hardpoints)
+                        ? "Deployed"
+                        : "Retracted",
                     StatusFlags.Wing => status.Flags.HasFlag(StatusFlags.Wing) ? "Wing" : "Solo",
                     StatusFlags.Lights => status.Flags.HasFlag(StatusFlags.Lights) ? "On" : "Off",
-                    StatusFlags.CargoScoop => status.Flags.HasFlag(StatusFlags.CargoScoop) ? "Deployed" : "Retracted",
-                    StatusFlags.SilentRunning => status.Flags.HasFlag(StatusFlags.SilentRunning) ? "Silent Running" : "",
-                    StatusFlags.FuelScooping => status.Flags.HasFlag(StatusFlags.FuelScooping) ? "Scooping" : "",
-                    StatusFlags.SRVBrake => status.Flags.HasFlag(StatusFlags.SRVBrake) ? "On" : "Off",
-                    StatusFlags.SRVTurret => status.Flags.HasFlag(StatusFlags.SRVTurret) ? "Active" : "Fixed",
-                    StatusFlags.SRVProximity => status.Flags.HasFlag(StatusFlags.SRVProximity) ? "Close" : "Clear",
-                    StatusFlags.SRVDriveAssist => status.Flags.HasFlag(StatusFlags.SRVDriveAssist) ? "On" : "Off",
-                    StatusFlags.Masslock => status.Flags.HasFlag(StatusFlags.Masslock) ? "Mass Locked" : "",
-                    StatusFlags.FSDCharging => status.Flags.HasFlag(StatusFlags.FSDCharging) ? "FSD Charging" : "FSD Idle",
-                    StatusFlags.FSDCooldown => status.Flags.HasFlag(StatusFlags.FSDCooldown) ? "FSD Cooldown" : "FSD Ready",
-                    StatusFlags.LowFuel => status.Flags.HasFlag(StatusFlags.LowFuel) ? "Low Fuel" : "Fuel OK",
-                    StatusFlags.Overheat => status.Flags.HasFlag(StatusFlags.Overheat) ? "Overheating" : "Temperature Normal",
-                    StatusFlags.LatLongValid => status.Flags.HasFlag(StatusFlags.LatLongValid) ? "Lat/Long Valid" : "Lat/Long Invalid",
-                    StatusFlags.InDanger => status.Flags.HasFlag(StatusFlags.InDanger) ? "In Danger" : "",
-                    StatusFlags.Interdiction => status.Flags.HasFlag(StatusFlags.Interdiction) ? "Interdicted" : "",
-                    StatusFlags.MainShip => status.Flags.HasFlag(StatusFlags.MainShip) ? "Ship" : "",
-                    StatusFlags.Fighter => status.Flags.HasFlag(StatusFlags.Fighter) ? "Fighter" : "",
+                    StatusFlags.CargoScoop => status.Flags.HasFlag(StatusFlags.CargoScoop)
+                        ? "Deployed"
+                        : "Retracted",
+                    StatusFlags.SilentRunning => status.Flags.HasFlag(StatusFlags.SilentRunning)
+                        ? "Silent Running"
+                        : "",
+                    StatusFlags.FuelScooping => status.Flags.HasFlag(StatusFlags.FuelScooping)
+                        ? "Scooping"
+                        : "",
+                    StatusFlags.SRVBrake => status.Flags.HasFlag(StatusFlags.SRVBrake)
+                        ? "On"
+                        : "Off",
+                    StatusFlags.SRVTurret => status.Flags.HasFlag(StatusFlags.SRVTurret)
+                        ? "Active"
+                        : "Fixed",
+                    StatusFlags.SRVProximity => status.Flags.HasFlag(StatusFlags.SRVProximity)
+                        ? "Close"
+                        : "Clear",
+                    StatusFlags.SRVDriveAssist => status.Flags.HasFlag(StatusFlags.SRVDriveAssist)
+                        ? "On"
+                        : "Off",
+                    StatusFlags.Masslock => status.Flags.HasFlag(StatusFlags.Masslock)
+                        ? "Mass Locked"
+                        : "",
+                    StatusFlags.FSDCharging => status.Flags.HasFlag(StatusFlags.FSDCharging)
+                        ? "FSD Charging"
+                        : "FSD Idle",
+                    StatusFlags.FSDCooldown => status.Flags.HasFlag(StatusFlags.FSDCooldown)
+                        ? "FSD Cooldown"
+                        : "FSD Ready",
+                    StatusFlags.LowFuel => status.Flags.HasFlag(StatusFlags.LowFuel)
+                        ? "Low Fuel"
+                        : "Fuel OK",
+                    StatusFlags.Overheat => status.Flags.HasFlag(StatusFlags.Overheat)
+                        ? "Overheating"
+                        : "Temperature Normal",
+                    StatusFlags.LatLongValid => status.Flags.HasFlag(StatusFlags.LatLongValid)
+                        ? "Lat/Long Valid"
+                        : "Lat/Long Invalid",
+                    StatusFlags.InDanger => status.Flags.HasFlag(StatusFlags.InDanger)
+                        ? "In Danger"
+                        : "",
+                    StatusFlags.Interdiction => status.Flags.HasFlag(StatusFlags.Interdiction)
+                        ? "Interdicted"
+                        : "",
+                    StatusFlags.MainShip => status.Flags.HasFlag(StatusFlags.MainShip)
+                        ? "Ship"
+                        : "",
+                    StatusFlags.Fighter => status.Flags.HasFlag(StatusFlags.Fighter)
+                        ? "Fighter"
+                        : "",
                     StatusFlags.SRV => status.Flags.HasFlag(StatusFlags.SRV) ? "SRV" : "",
-                    StatusFlags.AnalysisHUD => status.Flags.HasFlag(StatusFlags.AnalysisHUD) ? "Analysis" : "Combat",
-                    StatusFlags.NightVision => status.Flags.HasFlag(StatusFlags.NightVision) ? "On" : "Off",
-                    StatusFlags.RadialAltitude => status.Flags.HasFlag(StatusFlags.RadialAltitude) ? "Radial" : "Terrain",
-                    StatusFlags.FSDJump => status.Flags.HasFlag(StatusFlags.FSDJump) ? "FSD Jumping" : "",
-                    StatusFlags.SRVHighBeam => status.Flags.HasFlag(StatusFlags.SRVHighBeam) ? "On" : "Off",
+                    StatusFlags.AnalysisHUD => status.Flags.HasFlag(StatusFlags.AnalysisHUD)
+                        ? "Analysis"
+                        : "Combat",
+                    StatusFlags.NightVision => status.Flags.HasFlag(StatusFlags.NightVision)
+                        ? "On"
+                        : "Off",
+                    StatusFlags.RadialAltitude => status.Flags.HasFlag(StatusFlags.RadialAltitude)
+                        ? "Radial"
+                        : "Terrain",
+                    StatusFlags.FSDJump => status.Flags.HasFlag(StatusFlags.FSDJump)
+                        ? "FSD Jumping"
+                        : "",
+                    StatusFlags.SRVHighBeam => status.Flags.HasFlag(StatusFlags.SRVHighBeam)
+                        ? "On"
+                        : "Off",
                     _ => string.Empty,
                 };
             }
 
             string resolveFlag2(Framework.Files.Status? status, StatusFlags2 flag)
             {
-                if (status is null) return string.Empty;
+                if (status is null)
+                    return string.Empty;
                 return flag switch
                 {
-                    StatusFlags2.OnFoot => status.Flags2.HasFlag(StatusFlags2.OnFoot) ? "On Foot" : "",
-                    StatusFlags2.InTaxi => status.Flags2.HasFlag(StatusFlags2.InTaxi) ? "In Taxi" : "",
-                    StatusFlags2.InMulticrew => status.Flags2.HasFlag(StatusFlags2.InMulticrew) ? "In Multicrew" : "",
-                    StatusFlags2.OnFootInStation => status.Flags2.HasFlag(StatusFlags2.OnFootInStation) ? "In Station" : "",
-                    StatusFlags2.OnFootOnPlanet => status.Flags2.HasFlag(StatusFlags2.OnFootOnPlanet) ? "On Planet" : "",
-                    StatusFlags2.AimDownSight => status.Flags2.HasFlag(StatusFlags2.AimDownSight) ? "Aiming Down Sight" : "",
-                    StatusFlags2.LowOxygen => status.Flags2.HasFlag(StatusFlags2.LowOxygen) ? "Low Oxygen" : "",
-                    StatusFlags2.LowHealth => status.Flags2.HasFlag(StatusFlags2.LowHealth) ? "Low Health" : "",
+                    StatusFlags2.OnFoot => status.Flags2.HasFlag(StatusFlags2.OnFoot)
+                        ? "On Foot"
+                        : "",
+                    StatusFlags2.InTaxi => status.Flags2.HasFlag(StatusFlags2.InTaxi)
+                        ? "In Taxi"
+                        : "",
+                    StatusFlags2.InMulticrew => status.Flags2.HasFlag(StatusFlags2.InMulticrew)
+                        ? "In Multicrew"
+                        : "",
+                    StatusFlags2.OnFootInStation => status.Flags2.HasFlag(
+                        StatusFlags2.OnFootInStation
+                    )
+                        ? "In Station"
+                        : "",
+                    StatusFlags2.OnFootOnPlanet => status.Flags2.HasFlag(
+                        StatusFlags2.OnFootOnPlanet
+                    )
+                        ? "On Planet"
+                        : "",
+                    StatusFlags2.AimDownSight => status.Flags2.HasFlag(StatusFlags2.AimDownSight)
+                        ? "Aiming Down Sight"
+                        : "",
+                    StatusFlags2.LowOxygen => status.Flags2.HasFlag(StatusFlags2.LowOxygen)
+                        ? "Low Oxygen"
+                        : "",
+                    StatusFlags2.LowHealth => status.Flags2.HasFlag(StatusFlags2.LowHealth)
+                        ? "Low Health"
+                        : "",
                     StatusFlags2.Cold => status.Flags2.HasFlag(StatusFlags2.Cold) ? "Cold" : "",
                     StatusFlags2.Hot => status.Flags2.HasFlag(StatusFlags2.Hot) ? "Hot" : "",
-                    StatusFlags2.VeryCold => status.Flags2.HasFlag(StatusFlags2.VeryCold) ? "Very Cold" : "",
-                    StatusFlags2.VeryHot => status.Flags2.HasFlag(StatusFlags2.VeryHot) ? "Very Hot" : "",
-                    StatusFlags2.GlideMode => status.Flags2.HasFlag(StatusFlags2.GlideMode) ? "Gliding" : "",
-                    StatusFlags2.OnFootInHangar => status.Flags2.HasFlag(StatusFlags2.OnFootInHangar) ? "In Hangar" : "",
-                    StatusFlags2.OnFootInSocialSpace => status.Flags2.HasFlag(StatusFlags2.OnFootInSocialSpace) ? "In Social Space" : "",
-                    StatusFlags2.OnFootExterior => status.Flags2.HasFlag(StatusFlags2.OnFootExterior) ? "Exterior" : "",
-                    StatusFlags2.BreathableAtmosphere => status.Flags2.HasFlag(StatusFlags2.BreathableAtmosphere) ? "Breathable Atmosphere" : "",
-                    StatusFlags2.TelepresenceMulticrew => status.Flags2.HasFlag(StatusFlags2.TelepresenceMulticrew) ? "Telepresence" : "",
-                    StatusFlags2.PhysicalMulticrew => status.Flags2.HasFlag(StatusFlags2.PhysicalMulticrew) ? "Physical Multicrew" : "",
-                    StatusFlags2.FsdHyperdriveCharging => status.Flags2.HasFlag(StatusFlags2.FsdHyperdriveCharging) ? "FSD Charging" : "",
+                    StatusFlags2.VeryCold => status.Flags2.HasFlag(StatusFlags2.VeryCold)
+                        ? "Very Cold"
+                        : "",
+                    StatusFlags2.VeryHot => status.Flags2.HasFlag(StatusFlags2.VeryHot)
+                        ? "Very Hot"
+                        : "",
+                    StatusFlags2.GlideMode => status.Flags2.HasFlag(StatusFlags2.GlideMode)
+                        ? "Gliding"
+                        : "",
+                    StatusFlags2.OnFootInHangar => status.Flags2.HasFlag(
+                        StatusFlags2.OnFootInHangar
+                    )
+                        ? "In Hangar"
+                        : "",
+                    StatusFlags2.OnFootInSocialSpace => status.Flags2.HasFlag(
+                        StatusFlags2.OnFootInSocialSpace
+                    )
+                        ? "In Social Space"
+                        : "",
+                    StatusFlags2.OnFootExterior => status.Flags2.HasFlag(
+                        StatusFlags2.OnFootExterior
+                    )
+                        ? "Exterior"
+                        : "",
+                    StatusFlags2.BreathableAtmosphere => status.Flags2.HasFlag(
+                        StatusFlags2.BreathableAtmosphere
+                    )
+                        ? "Breathable Atmosphere"
+                        : "",
+                    StatusFlags2.TelepresenceMulticrew => status.Flags2.HasFlag(
+                        StatusFlags2.TelepresenceMulticrew
+                    )
+                        ? "Telepresence"
+                        : "",
+                    StatusFlags2.PhysicalMulticrew => status.Flags2.HasFlag(
+                        StatusFlags2.PhysicalMulticrew
+                    )
+                        ? "Physical Multicrew"
+                        : "",
+                    StatusFlags2.FsdHyperdriveCharging => status.Flags2.HasFlag(
+                        StatusFlags2.FsdHyperdriveCharging
+                    )
+                        ? "FSD Charging"
+                        : "",
                     _ => string.Empty,
                 };
             }
@@ -184,7 +306,6 @@ namespace Observatory.Photographer
             Dictionary<string, string> tokenLookup = new(StringComparer.InvariantCultureIgnoreCase)
             {
                 { "cmdr", cmdrName ?? string.Empty },
-
                 // Screenshot properties
                 { "latitude", metadata.Screenshot.Latitude.ToString() },
                 { "longitude", metadata.Screenshot.Longitude.ToString() },
@@ -192,23 +313,33 @@ namespace Observatory.Photographer
                 { "body", metadata.Screenshot.Body ?? string.Empty },
                 { "altitude", metadata.Screenshot.Altitude.ToString() },
                 { "heading", metadata.Screenshot.Heading.ToString() },
-                { "timestamp", metadata.Screenshot.TimestampDateTime.ToString("s").Replace(':', '-') },
-
+                {
+                    "timestamp",
+                    metadata.Screenshot.TimestampDateTime.ToString("s").Replace(':', '-')
+                },
                 // Status properties
                 { "guifocus", metadata.Status?.GuiFocus.ToString() ?? string.Empty },
                 { "balance", metadata.Status?.Balance.ToString() ?? string.Empty },
                 { "cargo", metadata.Status?.Cargo.ToString("N0") ?? string.Empty },
                 { "mainfuel", metadata.Status?.Fuel.FuelMain.ToString("N1") ?? string.Empty },
-                { "reservoirfuel", metadata.Status?.Fuel.FuelReservoir.ToString("N1") ?? string.Empty },
+                {
+                    "reservoirfuel",
+                    metadata.Status?.Fuel.FuelReservoir.ToString("N1") ?? string.Empty
+                },
                 { "health", (metadata.Status?.Health * 100)?.ToString("N0") ?? string.Empty },
                 { "oxygen", (metadata.Status?.Oxygen * 100)?.ToString("N0") ?? string.Empty },
                 { "destination", metadata.Status?.Destination.Name ?? string.Empty },
                 { "gravity-g", metadata.Status?.Gravity.ToString("N2") ?? string.Empty },
-                { "gravity-mps2", (metadata.Status?.Gravity * 9.81)?.ToString("N2") ?? string.Empty },
+                {
+                    "gravity-mps2",
+                    (metadata.Status?.Gravity * 9.81)?.ToString("N2") ?? string.Empty
+                },
                 { "legalstate", metadata.Status?.LegalState.ToString() ?? string.Empty },
-                { "radius", (metadata.Status?.PlanetRadius / 1000)?.ToString("N0") ?? string.Empty },
+                {
+                    "radius",
+                    (metadata.Status?.PlanetRadius / 1000)?.ToString("N0") ?? string.Empty
+                },
                 { "temperature", metadata.Status?.Temperature.ToString("N1") ?? string.Empty },
-
                 // Status flags
                 { "hud", resolveFlag(metadata.Status, StatusFlags.AnalysisHUD) },
                 { "docked", resolveFlag(metadata.Status, StatusFlags.Docked) },
@@ -242,7 +373,6 @@ namespace Observatory.Photographer
                 { "radialaltitude", resolveFlag(metadata.Status, StatusFlags.RadialAltitude) },
                 { "fsdjump", resolveFlag(metadata.Status, StatusFlags.FSDJump) },
                 { "srvhighbeam", resolveFlag(metadata.Status, StatusFlags.SRVHighBeam) },
-
                 // StatusFlags2
                 { "onfoot", resolveFlag2(metadata.Status, StatusFlags2.OnFoot) },
                 { "intaxi", resolveFlag2(metadata.Status, StatusFlags2.InTaxi) },
@@ -258,12 +388,27 @@ namespace Observatory.Photographer
                 { "veryhot", resolveFlag2(metadata.Status, StatusFlags2.VeryHot) },
                 { "glidemode", resolveFlag2(metadata.Status, StatusFlags2.GlideMode) },
                 { "onfootinhangar", resolveFlag2(metadata.Status, StatusFlags2.OnFootInHangar) },
-                { "onfootinsocialspace", resolveFlag2(metadata.Status, StatusFlags2.OnFootInSocialSpace) },
+                {
+                    "onfootinsocialspace",
+                    resolveFlag2(metadata.Status, StatusFlags2.OnFootInSocialSpace)
+                },
                 { "onfootexterior", resolveFlag2(metadata.Status, StatusFlags2.OnFootExterior) },
-                { "breathableatmosphere", resolveFlag2(metadata.Status, StatusFlags2.BreathableAtmosphere) },
-                { "telepresencemulticrew", resolveFlag2(metadata.Status, StatusFlags2.TelepresenceMulticrew) },
-                { "physicalmulticrew", resolveFlag2(metadata.Status, StatusFlags2.PhysicalMulticrew) },
-                { "fsdhyperdrivecharging", resolveFlag2(metadata.Status, StatusFlags2.FsdHyperdriveCharging) },
+                {
+                    "breathableatmosphere",
+                    resolveFlag2(metadata.Status, StatusFlags2.BreathableAtmosphere)
+                },
+                {
+                    "telepresencemulticrew",
+                    resolveFlag2(metadata.Status, StatusFlags2.TelepresenceMulticrew)
+                },
+                {
+                    "physicalmulticrew",
+                    resolveFlag2(metadata.Status, StatusFlags2.PhysicalMulticrew)
+                },
+                {
+                    "fsdhyperdrivecharging",
+                    resolveFlag2(metadata.Status, StatusFlags2.FsdHyperdriveCharging)
+                },
             };
 
             foreach (var kvp in tokenLookup)
@@ -276,31 +421,28 @@ namespace Observatory.Photographer
             while (timestampTokenStart != -1)
             {
                 var timestampTokenEnd = tokenizedString.IndexOf('}', timestampTokenStart);
-                if (timestampTokenEnd == -1) break; // No closing brace found
+                if (timestampTokenEnd == -1)
+                    break; // No closing brace found
                 var format = tokenizedString[(timestampTokenStart + 11)..timestampTokenEnd];
                 var formattedTimestamp = metadata.Screenshot.TimestampDateTime.ToString(format);
                 tokenizedString = string.Concat(
-                    tokenizedString.AsSpan()[..timestampTokenStart], 
-                    formattedTimestamp, 
-                    tokenizedString.AsSpan(timestampTokenEnd + 1));
-                timestampTokenStart = tokenizedString.IndexOf("{timestamp:", timestampTokenStart + formattedTimestamp.Length);
+                    tokenizedString.AsSpan()[..timestampTokenStart],
+                    formattedTimestamp,
+                    tokenizedString.AsSpan(timestampTokenEnd + 1)
+                );
+                timestampTokenStart = tokenizedString.IndexOf(
+                    "{timestamp:",
+                    timestampTokenStart + formattedTimestamp.Length
+                );
             }
 
             return tokenizedString;
         }
 
-        public static void EmbedMetadata(MetaAction metaAction, string filename)
-        {
-            var exifData = new CompactExifLib.ExifData(filename);
-            exifData.SetTagValue(CompactExifLib.ExifTag.Software, "Observatory Photographer", CompactExifLib.StrCoding.Utf8);
-            exifData.Save(filename);
-            // metaAction.Metadata.Image.SetAttribute("Exif:Software", "Observatory Photographer");
-        }
-
         public static int FindOpenQuad(MagickImage image, bool twoPass = false)
         {
             var quads = image.CropToTiles(image.Width / 2, image.Height / 2);
-            var quadSizes = quads.Select(q => 
+            var quadSizes = quads.Select(q =>
             {
                 using MemoryStream qStream = new();
                 q.Format = MagickFormat.Jpeg;
@@ -328,7 +470,10 @@ namespace Observatory.Photographer
                 FontPointsize = action.Font.SizeInPoints,
             };
 
-            using var caption = new MagickImage($"caption:{FillTokenizedString(action.Text, imageData, action.CmdrName)}", captionSettings);
+            using var caption = new MagickImage(
+                $"caption:{FillTokenizedString(action.Text, imageData, action.CmdrName)}",
+                captionSettings
+            );
 
             if (action.LocationMethod == LocationMethod.Automatic)
             {
@@ -336,12 +481,11 @@ namespace Observatory.Photographer
             }
             else if (action.LocationMethod == LocationMethod.Quadrant)
             {
-                quad = action.SecondOrder
-                    ? (int)action.SecondOrderQuad
-                    : (int)action.Quad;
+                quad = action.SecondOrder ? (int)action.SecondOrderQuad : (int)action.Quad;
             }
 
-            int x = 0, y = 0;
+            int x = 0,
+                y = 0;
             if (action.LocationMethod == LocationMethod.Manual)
             {
                 x = action.Location.X;
@@ -379,17 +523,16 @@ namespace Observatory.Photographer
             }
             else if (action.LocationMethod == LocationMethod.Quadrant)
             {
-                quad = action.SecondOrder
-                    ? (int)action.SecondOrderQuad
-                    : (int)action.Quad;
+                quad = action.SecondOrder ? (int)action.SecondOrderQuad : (int)action.Quad;
             }
 
-            int x, y;
+            int x,
+                y;
             MagickImage watermark = new(action.WatermarkImagePath);
 
             if (action.LocationMethod == LocationMethod.Manual)
             {
-                x = action.Location.X; 
+                x = action.Location.X;
                 y = action.Location.Y;
                 imageData.Image.Composite(watermark, x, y);
             }
@@ -432,8 +575,9 @@ namespace Observatory.Photographer
             var image = imageData.Image;
             if (sizeAction.Relative)
             {
-                uint newHeight = (uint)(image.Height * (sizeAction.Y / 100));
-                uint newWidth = (uint)(image.Width * (sizeAction.X / 100));
+                // Relative scaling stores percentage in sizeAction.X, ignore sizeAction.Y
+                uint newHeight = (uint)(image.Height * (sizeAction.X / 100f));
+                uint newWidth = (uint)(image.Width * (sizeAction.X / 100f));
                 image.Resize(newWidth, newHeight);
             }
             else
@@ -444,11 +588,18 @@ namespace Observatory.Photographer
 
         public static void SaveImage(SaveAction action, ImageWithMetadata imageData, bool embedMeta)
         {
+            if (embedMeta)
+            {
+                EmbedMeta(imageData, action);
+            }
+
             var image = imageData.Image;
             image.Format = action.Format;
             image.Quality = action.Quality;
             var filename = FillTokenizedString(action.FilePattern, imageData, action.CmdrName);
-            var sanitizedCharacters = filename.Where(c => !Path.GetInvalidFileNameChars().Contains(c)).ToArray();
+            var sanitizedCharacters = filename
+                .Where(c => !Path.GetInvalidFileNameChars().Contains(c))
+                .ToArray();
             filename = new string(sanitizedCharacters);
 
             var (extension, validExtensions) = action.Format switch
@@ -457,11 +608,15 @@ namespace Observatory.Photographer
                 MagickFormat.Png => (".png", [".png"]),
                 MagickFormat.Heic => (".heic", [".heic", ".heif"]),
                 MagickFormat.WebP => (".webp", [".webp"]),
-                MagickFormat.Bmp => (".bmp", [ ".bmp", ".dib" ]),
-                _ => throw new ArgumentException("Unsupported format")
+                MagickFormat.Bmp => (".bmp", [".bmp", ".dib"]),
+                _ => throw new ArgumentException("Unsupported format"),
             };
 
-            if (!validExtensions.Any(ext => filename.EndsWith(ext, StringComparison.OrdinalIgnoreCase)))
+            if (
+                !validExtensions.Any(ext =>
+                    filename.EndsWith(ext, StringComparison.OrdinalIgnoreCase)
+                )
+            )
             {
                 filename += extension;
             }
@@ -469,22 +624,79 @@ namespace Observatory.Photographer
             var fullPath = action.FolderPath + Path.DirectorySeparatorChar + filename;
 
             image.Write(fullPath);
+        }
 
-            if (embedMeta)
+        private static void EmbedMeta(ImageWithMetadata image, SaveAction action)
+        {
+            Dictionary<string, object?> allMeta = new()
             {
-                var exifData = new CompactExifLib.ExifData(fullPath);
-                exifData.SetTagValue(CompactExifLib.ExifTag.Software, "Observatory Photographer", CompactExifLib.StrCoding.Utf8);
-                exifData.SetTagValue(CompactExifLib.ExifTag.DocumentName, imageData.Screenshot.Body, CompactExifLib.StrCoding.Utf8);
-                exifData.SetDateTaken(imageData.Screenshot.TimestampDateTime);
-                exifData.SetGpsDateTimeStamp(imageData.Screenshot.TimestampDateTime);
-                exifData.SetGpsLatitude(CompactExifLib.GeoCoordinate.FromDecimal((decimal)imageData.Screenshot.Latitude, true));
-                exifData.SetGpsLongitude(CompactExifLib.GeoCoordinate.FromDecimal((decimal)imageData.Screenshot.Longitude, false));
-                exifData.SetGpsAltitude((decimal)imageData.Screenshot.Altitude);
-                exifData.SetTagValue(CompactExifLib.ExifTag.XpTitle, imageData.Screenshot.System, CompactExifLib.StrCoding.Utf8);
-                exifData.SetTagValue(CompactExifLib.ExifTag.XpSubject, imageData.Screenshot.Body ?? string.Empty, CompactExifLib.StrCoding.Utf8);
-                exifData.SetTagValue(CompactExifLib.ExifTag.XpAuthor, action.CmdrName ?? string.Empty, CompactExifLib.StrCoding.Utf8);
-                // exifData.SetTagValue(CompactExifLib.ExifTag.UserComment, jsonMeta, CompactExifLib.StrCoding.Utf8);
-                exifData.Save(fullPath);
+                { "Screenshot", image.Screenshot },
+                { "Status", image.Status },
+            };
+
+            if (action.Format != MagickFormat.Png)
+            {
+                var exifData = image.Image.GetExifProfile() ?? new ExifProfile();
+                exifData.SetValue(ExifTag.Software, "Observatory Photographer");
+                exifData.SetValue(
+                    ExifTag.ImageDescription,
+                    image.Screenshot.System ?? string.Empty
+                );
+                exifData.SetValue(
+                    ExifTag.XPSubject,
+                    Encoding.Unicode.GetBytes(image.Screenshot.Body ?? string.Empty)
+                );
+                exifData.SetValue(ExifTag.Artist, action.CmdrName ?? string.Empty);
+                exifData.SetValue(ExifTag.DateTimeOriginal, image.Screenshot.Timestamp);
+
+                // Convert decimal coordinates to DMS format for EXIF GPS tags
+                var absLat = Math.Abs(image.Screenshot.Latitude);
+                Rational latDegress = new(Math.Floor(absLat));
+                Rational latMinutes = new(Math.Floor(absLat * 60 % 60));
+                Rational latSeconds = new(absLat * 3600 % 60);
+
+                var absLong = Math.Abs(image.Screenshot.Longitude);
+                Rational longDegress = new(Math.Floor(absLong));
+                Rational longMinutes = new(Math.Floor(absLong * 60 % 60));
+                Rational longSeconds = new(absLong * 3600 % 60);
+
+                exifData.SetValue(ExifTag.GPSLatitude, [latDegress, latMinutes, latSeconds]);
+                exifData.SetValue(
+                    ExifTag.GPSLatitudeRef,
+                    image.Screenshot.Latitude >= 0 ? "N" : "S"
+                );
+                exifData.SetValue(ExifTag.GPSLongitude, [longDegress, longMinutes, longSeconds]);
+                exifData.SetValue(
+                    ExifTag.GPSLongitudeRef,
+                    image.Screenshot.Longitude >= 0 ? "E" : "W"
+                );
+
+                // Place all available metadata in UserComment as JSON
+                exifData.SetValue(
+                    ExifTag.UserComment,
+                    [
+                        // "UNICODE\0" in ASCII/UTF8 followed by the UTF16 encoded string
+                        0x55,
+                        0x4E,
+                        0x49,
+                        0x43,
+                        0x4F,
+                        0x44,
+                        0x45,
+                        0x00,
+                        .. Encoding.Unicode.GetBytes(JsonSerializer.Serialize(allMeta)),
+                    ]
+                );
+
+                image.Image.SetProfile(exifData);
+            }
+            else
+            {
+                image.Image.SetAttribute("Software", "Observatory Photographer");
+                image.Image.SetAttribute("Author", action.CmdrName ?? string.Empty);
+                image.Image.SetAttribute("Description", image.Screenshot.System);
+                image.Image.SetAttribute("Create Time", image.Screenshot.Timestamp);
+                image.Image.SetAttribute("ObservatoryMetadata", JsonSerializer.Serialize(allMeta));
             }
         }
     }

@@ -1,6 +1,6 @@
-﻿using Observatory.Framework.Files.Journal;
+﻿using ImageMagick;
 using Observatory.Framework.Files;
-using ImageMagick;
+using Observatory.Framework.Files.Journal;
 
 namespace Observatory.Photographer
 {

@@ -74,8 +74,8 @@
                     "Top-Left Of Bottom-Right",
                     "Top-Right Of Bottom-Right",
                     "Bottom-Left Of Bottom-Right",
-                    "Bottom-Right Of Bottom-Right"
-                    ]);
+                    "Bottom-Right Of Bottom-Right",
+                ]);
                 LocationQuadDropdown.SelectedIndex = prevIndex * 4;
             }
             else
@@ -84,8 +84,8 @@
                     "Top-Left",
                     "Top-Right",
                     "Bottom-Left",
-                    "Bottom-Right"
-                    ]);
+                    "Bottom-Right",
+                ]);
                 LocationQuadDropdown.SelectedIndex = prevIndex / 4;
             }
         }
@@ -93,21 +93,21 @@
         private void BrowseButton_Click(object sender, EventArgs e)
         {
             string[] fileTypes =
-                [
-                    "Image Types|*.png;*.jpg;*.jpeg;*.gif;*.webp;*.heic;*.avif;*.bmp",
-                    "PNG (*.png)|*.png",
-                    "JPEG (*.jpg, *.jpeg)|*.jpg;*.jpeg",
-                    "GIF (*.gif)|*.gif",
-                    "WebP (*.webp)|*.webp",
-                    "HEIC (*.heic)|*.heic",
-                    "AVIF (*.avif)|*.avif",
-                    "Bitmap (*.bmp)|*.bmp"
-                ];
+            [
+                "Image Types|*.png;*.jpg;*.jpeg;*.gif;*.webp;*.heic;*.avif;*.bmp",
+                "PNG (*.png)|*.png",
+                "JPEG (*.jpg, *.jpeg)|*.jpg;*.jpeg",
+                "GIF (*.gif)|*.gif",
+                "WebP (*.webp)|*.webp",
+                "HEIC (*.heic)|*.heic",
+                "AVIF (*.avif)|*.avif",
+                "Bitmap (*.bmp)|*.bmp",
+            ];
             var dialog = new OpenFileDialog
             {
                 CheckFileExists = true,
                 Title = "Select Watermark Image",
-                Filter = string.Join('|', fileTypes)
+                Filter = string.Join('|', fileTypes),
             };
             var result = dialog.ShowDialog();
             if (result == DialogResult.OK)
@@ -127,9 +127,9 @@
             LocationRelativeCheckbox.Enabled = LocationSpecificRadio.Checked;
 
             WatermarkAction.LocationMethod =
-                AutomaticLocationRadio.Checked ? LocationMethod.Automatic :
-                LocationQuadRadio.Checked ? LocationMethod.Quadrant :
-                LocationMethod.Manual;
+                AutomaticLocationRadio.Checked ? LocationMethod.Automatic
+                : LocationQuadRadio.Checked ? LocationMethod.Quadrant
+                : LocationMethod.Manual;
         }
 
         private void QuadOrderCheckbox_CheckedChanged(object sender, EventArgs e)
