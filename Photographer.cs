@@ -52,7 +52,6 @@ namespace Observatory.Photographer
                     _imageData[_ui.PhotoListView.SelectedItems[0].ImageKey].Screenshot,
                     _ui.PhotoListView.SelectedItems[0].ImageKey
                 );
-            //BuildImageCaption(_imageData[_ui.PhotoListView.SelectedItems[0].ImageKey]);
         }
 
         private static string BuildImageCaption(ImageWithMetadata metadata)
@@ -120,7 +119,7 @@ namespace Observatory.Photographer
         public void HandleScreenshot(Screenshot screenshot)
         {
             TaskCleanup();
-            if (Proceed(_core.CurrentLogMonitorState))
+            if (ProceedWithImport(_core.CurrentLogMonitorState))
             {
                 var picturesPath = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
                 var filename = screenshot.Filename
@@ -263,21 +262,21 @@ namespace Observatory.Photographer
             }
         }
 
-        private bool Proceed(LogMonitorState state)
+        private bool ProceedWithImport(LogMonitorState state)
         {
             var batchCheck =
-                _settings.ProcessDuringReadAll || !state.HasFlag(LogMonitorState.Batch);
+                _settings.ImportDuringReadAll || _settings.ProcessDuringReadAll || !state.HasFlag(LogMonitorState.Batch);
             var realtimeCheck =
                 _settings.ProcessWhileMonitoring || !state.HasFlag(LogMonitorState.Realtime);
 
             // Don't ever process from pre-read
-            return batchCheck && realtimeCheck && !state.HasFlag(LogMonitorState.PreRead);
+            return (batchCheck || realtimeCheck) && !state.HasFlag(LogMonitorState.PreRead);
         }
 
         private bool StatusIsCurrent(LogMonitorState state) =>
             state.HasFlag(LogMonitorState.Realtime);
 
-        private static string CreateImageDataText(Screenshot screenshot, string fullFilename)
+        private string CreateImageDataText(Screenshot screenshot, string fullFilename)
         {
             StringBuilder dataText = new();
             dataText.AppendLine($"Time taken: {screenshot.Timestamp}");
@@ -304,6 +303,12 @@ namespace Observatory.Photographer
             dataText.AppendLine($"Height: {screenshot.Height}");
             dataText.AppendLine($"File Size: {new FileInfo(fullFilename).Length}");
             dataText.AppendLine($"Full file path: {fullFilename}");
+            if (_imageData.TryGetValue(fullFilename, out ImageWithMetadata? metadata) && metadata.Status != null)
+            {
+                dataText.AppendLine();
+                dataText.AppendLine($"Extended Metadata Available");
+            }
+
             return dataText.ToString();
         }
 
