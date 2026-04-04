@@ -33,6 +33,7 @@
             InfoLabel = new Label();
             ProcessButton = new Button();
             PhotoView = new ListView();
+            ProcessingLabel = new Label();
             FlowPanel.SuspendLayout();
             InfoBox.SuspendLayout();
             SuspendLayout();
@@ -43,6 +44,7 @@
             FlowPanel.Controls.Add(InfoBox);
             FlowPanel.Controls.Add(ProcessButton);
             FlowPanel.Controls.Add(PhotoView);
+            FlowPanel.Controls.Add(ProcessingLabel);
             FlowPanel.Location = new Point(12, 12);
             FlowPanel.Name = "FlowPanel";
             FlowPanel.Size = new Size(776, 426);
@@ -66,7 +68,6 @@
             InfoLabel.Name = "InfoLabel";
             InfoLabel.Size = new Size(278, 368);
             InfoLabel.TabIndex = 0;
-            InfoLabel.Text = "Image Metadata Here";
             // 
             // ProcessButton
             // 
@@ -90,6 +91,18 @@
             PhotoView.TabIndex = 0;
             PhotoView.UseCompatibleStateImageBehavior = false;
             // 
+            // ProcessingLabel
+            // 
+            ProcessingLabel.Dock = DockStyle.Fill;
+            ProcessingLabel.Enabled = false;
+            ProcessingLabel.Location = new Point(0, 0);
+            ProcessingLabel.Name = "ProcessingLabel";
+            ProcessingLabel.Size = new Size(776, 426);
+            ProcessingLabel.TabIndex = 6;
+            ProcessingLabel.Text = "Processing...";
+            ProcessingLabel.TextAlign = ContentAlignment.MiddleCenter;
+            ProcessingLabel.Visible = false;
+            // 
             // MainPanel
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -110,5 +123,6 @@
         private Button ProcessButton;
         private GroupBox InfoBox;
         private Label InfoLabel;
+        private Label ProcessingLabel;
     }
 }

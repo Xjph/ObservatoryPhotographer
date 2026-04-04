@@ -1,4 +1,5 @@
-﻿using ImageMagick;
+﻿using System.Text.Json.Serialization;
+using ImageMagick;
 
 namespace Observatory.Photographer
 {
@@ -18,6 +19,12 @@ namespace Observatory.Photographer
         Automatic,
     }
 
+    [JsonPolymorphic(TypeDiscriminatorPropertyName = "Action")]
+    [JsonDerivedType(typeof(SaveAction), (int)PhotoActionKind.Save)]
+    [JsonDerivedType(typeof(ResizeAction), (int)PhotoActionKind.Resize)]
+    [JsonDerivedType(typeof(CaptionAction), (int)PhotoActionKind.Caption)]
+    [JsonDerivedType(typeof(WatermarkAction), (int)PhotoActionKind.Watermark)]
+    [JsonDerivedType(typeof(MetaAction), (int)PhotoActionKind.Meta)]
     public abstract class PhotoAction
     {
         public abstract PhotoActionKind Action { get; }

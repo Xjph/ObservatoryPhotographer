@@ -47,7 +47,7 @@
             WatermarkButton = new Button();
             CancelBtn = new Button();
             OkButton = new Button();
-            SaveButton = new Button();
+            SetDefaultButton = new Button();
             MetadataCheckbox = new CheckBox();
             FilenameLabel = new Label();
             FilenameLink = new LinkLabel();
@@ -56,6 +56,8 @@
             ExampleLabel = new Label();
             FormatLabel = new Label();
             ProcessingLabel = new Label();
+            LoadPresetButton = new Button();
+            SavePresetButton = new Button();
             ResizePanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)ResizePercentSpinner).BeginInit();
             ((System.ComponentModel.ISupportInitialize)ResizeYSpinner).BeginInit();
@@ -217,7 +219,7 @@
             CaptionTextbox.Location = new Point(12, 142);
             CaptionTextbox.Multiline = true;
             CaptionTextbox.Name = "CaptionTextbox";
-            CaptionTextbox.Size = new Size(298, 95);
+            CaptionTextbox.Size = new Size(298, 108);
             CaptionTextbox.TabIndex = 10;
             CaptionTextbox.TextChanged += CaptionTextbox_TextChanged;
             // 
@@ -225,7 +227,7 @@
             // 
             WatermarkCheckbox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             WatermarkCheckbox.AutoSize = true;
-            WatermarkCheckbox.Location = new Point(12, 243);
+            WatermarkCheckbox.Location = new Point(12, 259);
             WatermarkCheckbox.Name = "WatermarkCheckbox";
             WatermarkCheckbox.Size = new Size(84, 19);
             WatermarkCheckbox.TabIndex = 11;
@@ -237,7 +239,7 @@
             WatermarkButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             WatermarkButton.FlatAppearance.BorderSize = 0;
             WatermarkButton.FlatStyle = FlatStyle.Flat;
-            WatermarkButton.Location = new Point(102, 240);
+            WatermarkButton.Location = new Point(102, 256);
             WatermarkButton.Name = "WatermarkButton";
             WatermarkButton.Size = new Size(72, 23);
             WatermarkButton.TabIndex = 12;
@@ -250,7 +252,7 @@
             CancelBtn.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             CancelBtn.FlatAppearance.BorderSize = 0;
             CancelBtn.FlatStyle = FlatStyle.Flat;
-            CancelBtn.Location = new Point(238, 496);
+            CancelBtn.Location = new Point(238, 433);
             CancelBtn.Name = "CancelBtn";
             CancelBtn.Size = new Size(72, 23);
             CancelBtn.TabIndex = 13;
@@ -263,7 +265,7 @@
             OkButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             OkButton.FlatAppearance.BorderSize = 0;
             OkButton.FlatStyle = FlatStyle.Flat;
-            OkButton.Location = new Point(157, 496);
+            OkButton.Location = new Point(157, 433);
             OkButton.Name = "OkButton";
             OkButton.Size = new Size(72, 23);
             OkButton.TabIndex = 14;
@@ -271,24 +273,24 @@
             OkButton.UseVisualStyleBackColor = true;
             OkButton.Click += OkButton_Click;
             // 
-            // SaveButton
+            // SetDefaultButton
             // 
-            SaveButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            SaveButton.FlatAppearance.BorderSize = 0;
-            SaveButton.FlatStyle = FlatStyle.Flat;
-            SaveButton.Location = new Point(12, 496);
-            SaveButton.Name = "SaveButton";
-            SaveButton.Size = new Size(84, 23);
-            SaveButton.TabIndex = 15;
-            SaveButton.Text = "Save Preset";
-            SaveButton.UseVisualStyleBackColor = true;
-            SaveButton.Click += SaveButton_Click;
+            SetDefaultButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            SetDefaultButton.FlatAppearance.BorderSize = 0;
+            SetDefaultButton.FlatStyle = FlatStyle.Flat;
+            SetDefaultButton.Location = new Point(12, 433);
+            SetDefaultButton.Name = "SetDefaultButton";
+            SetDefaultButton.Size = new Size(84, 23);
+            SetDefaultButton.TabIndex = 15;
+            SetDefaultButton.Text = "Set Default";
+            SetDefaultButton.UseVisualStyleBackColor = true;
+            SetDefaultButton.Click += SetDefaultButton_Click;
             // 
             // MetadataCheckbox
             // 
             MetadataCheckbox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             MetadataCheckbox.AutoSize = true;
-            MetadataCheckbox.Location = new Point(12, 268);
+            MetadataCheckbox.Location = new Point(12, 284);
             MetadataCheckbox.Name = "MetadataCheckbox";
             MetadataCheckbox.Size = new Size(116, 19);
             MetadataCheckbox.TabIndex = 16;
@@ -299,7 +301,7 @@
             // 
             FilenameLabel.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             FilenameLabel.AutoSize = true;
-            FilenameLabel.Location = new Point(12, 290);
+            FilenameLabel.Location = new Point(12, 306);
             FilenameLabel.Name = "FilenameLabel";
             FilenameLabel.Size = new Size(138, 15);
             FilenameLabel.TabIndex = 17;
@@ -309,7 +311,7 @@
             // 
             FilenameLink.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             FilenameLink.AutoSize = true;
-            FilenameLink.Location = new Point(290, 290);
+            FilenameLink.Location = new Point(290, 306);
             FilenameLink.Name = "FilenameLink";
             FilenameLink.Size = new Size(20, 15);
             FilenameLink.TabIndex = 18;
@@ -320,7 +322,7 @@
             // FilenameTextbox
             // 
             FilenameTextbox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            FilenameTextbox.Location = new Point(12, 308);
+            FilenameTextbox.Location = new Point(12, 324);
             FilenameTextbox.Name = "FilenameTextbox";
             FilenameTextbox.Size = new Size(298, 23);
             FilenameTextbox.TabIndex = 19;
@@ -328,8 +330,9 @@
             // 
             // ExampleBox
             // 
+            ExampleBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             ExampleBox.Controls.Add(ExampleLabel);
-            ExampleBox.Location = new Point(12, 337);
+            ExampleBox.Location = new Point(12, 353);
             ExampleBox.Name = "ExampleBox";
             ExampleBox.Size = new Size(298, 43);
             ExampleBox.TabIndex = 20;
@@ -338,10 +341,9 @@
             // 
             // ExampleLabel
             // 
-            ExampleLabel.AutoSize = true;
             ExampleLabel.Location = new Point(6, 19);
             ExampleLabel.Name = "ExampleLabel";
-            ExampleLabel.Size = new Size(126, 15);
+            ExampleLabel.Size = new Size(286, 15);
             ExampleLabel.TabIndex = 0;
             ExampleLabel.Text = "Filename Example Text";
             // 
@@ -361,24 +363,52 @@
             ProcessingLabel.Enabled = false;
             ProcessingLabel.Location = new Point(0, 0);
             ProcessingLabel.Name = "ProcessingLabel";
-            ProcessingLabel.Size = new Size(324, 531);
+            ProcessingLabel.Size = new Size(324, 468);
             ProcessingLabel.TabIndex = 22;
             ProcessingLabel.Text = "Processing...";
             ProcessingLabel.TextAlign = ContentAlignment.MiddleCenter;
             ProcessingLabel.Visible = false;
             // 
+            // LoadPresetButton
+            // 
+            LoadPresetButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            LoadPresetButton.FlatAppearance.BorderSize = 0;
+            LoadPresetButton.FlatStyle = FlatStyle.Flat;
+            LoadPresetButton.Location = new Point(12, 404);
+            LoadPresetButton.Name = "LoadPresetButton";
+            LoadPresetButton.Size = new Size(84, 23);
+            LoadPresetButton.TabIndex = 23;
+            LoadPresetButton.Text = "Load Preset";
+            LoadPresetButton.UseVisualStyleBackColor = true;
+            LoadPresetButton.Click += LoadPresetButton_Click;
+            // 
+            // SavePresetButton
+            // 
+            SavePresetButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            SavePresetButton.FlatAppearance.BorderSize = 0;
+            SavePresetButton.FlatStyle = FlatStyle.Flat;
+            SavePresetButton.Location = new Point(102, 404);
+            SavePresetButton.Name = "SavePresetButton";
+            SavePresetButton.Size = new Size(84, 23);
+            SavePresetButton.TabIndex = 24;
+            SavePresetButton.Text = "Save Preset";
+            SavePresetButton.UseVisualStyleBackColor = true;
+            SavePresetButton.Click += SavePresetButton_Click;
+            // 
             // ProcessForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(324, 531);
+            ClientSize = new Size(324, 468);
+            Controls.Add(SavePresetButton);
+            Controls.Add(LoadPresetButton);
             Controls.Add(FormatLabel);
             Controls.Add(ExampleBox);
             Controls.Add(FilenameTextbox);
             Controls.Add(FilenameLink);
             Controls.Add(FilenameLabel);
             Controls.Add(MetadataCheckbox);
-            Controls.Add(SaveButton);
+            Controls.Add(SetDefaultButton);
             Controls.Add(OkButton);
             Controls.Add(CancelBtn);
             Controls.Add(WatermarkButton);
@@ -403,7 +433,6 @@
             ((System.ComponentModel.ISupportInitialize)ResizeXSpinner).EndInit();
             ((System.ComponentModel.ISupportInitialize)QualitySpinner).EndInit();
             ExampleBox.ResumeLayout(false);
-            ExampleBox.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -428,7 +457,7 @@
         private Button WatermarkButton;
         private Button CancelBtn;
         private Button OkButton;
-        private Button SaveButton;
+        private Button SetDefaultButton;
         private CheckBox MetadataCheckbox;
         private Label FilenameLabel;
         private LinkLabel FilenameLink;
@@ -437,5 +466,7 @@
         private Label ExampleLabel;
         private Label FormatLabel;
         private Label ProcessingLabel;
+        private Button LoadPresetButton;
+        private Button SavePresetButton;
     }
 }

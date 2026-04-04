@@ -15,7 +15,9 @@ namespace Observatory.Photographer.UI
         private ResizeAction _resizeAction;
         private MetaAction _metaAction;
         private readonly IObservatoryCore? _core;
+        private readonly PhotoData _photoData;
         private readonly PhotoWorker? _worker;
+        private string _currentPreset = string.Empty;
 
         public ProcessForm(ImageWithMetadata metadata, IObservatoryCore? core, PhotoWorker? worker)
         {
@@ -40,6 +42,7 @@ namespace Observatory.Photographer.UI
             _metaAction = new();
             _core = core;
             _worker = worker;
+            _photoData = new(core);
             core?.RegisterControl(_captionForm);
             core?.RegisterControl(_watermarkForm);
             CancelButton = CancelBtn;
@@ -47,18 +50,8 @@ namespace Observatory.Photographer.UI
             RestoreSavedProcess();
         }
 
-        private void RestoreSavedProcess()
+        private void UpdateUIFromActionList(IEnumerable<PhotoAction> actionList)
         {
-            object[] actionList;
-            try
-            {
-                actionList = ((PhotoSettings?)_worker?.Settings)?.SavedActions ?? [];
-            }
-            catch
-            {
-                actionList = [];
-            }
-
             foreach (var action in actionList)
             {
                 switch (action)
@@ -133,6 +126,27 @@ namespace Observatory.Photographer.UI
             ConvertDropdown.SelectedItem ??= "PNG";
         }
 
+        private void RestoreSavedProcess()
+        {
+            IEnumerable<PhotoAction> actionList;
+            try
+            {
+                var defaultAction =
+                    ((PhotoSettings?)_worker?.Settings)?.DefaultPreset ?? string.Empty;
+                _photoData.SavedPresets.TryGetValue(
+                    defaultAction,
+                    out IEnumerable<PhotoAction>? defaultActions
+                );
+                actionList = defaultActions ?? [];
+            }
+            catch
+            {
+                actionList = [];
+            }
+
+            UpdateUIFromActionList(actionList);
+        }
+
         private void CaptionButton_Click(object sender, EventArgs e)
         {
             _captionForm.ShowDialog();
@@ -148,19 +162,21 @@ namespace Observatory.Photographer.UI
             ProcessingLabel.BringToFront();
             ProcessingLabel.Enabled = true;
             ProcessingLabel.Visible = true;
-            Task.Run(() => {
+            Task.Run(() =>
+            {
                 ImageUtils.PerformPhotoActions(BuildActionList(), _image);
                 _core?.ExecuteOnUIThread(() => Close());
             });
         }
 
-        private void SaveButton_Click(object sender, EventArgs e)
+        private void SetDefaultButton_Click(object sender, EventArgs e)
         {
-            var actionList = BuildActionList();
             var settings = (PhotoSettings?)_worker?.Settings;
             if (settings is null)
                 return;
-            settings.SavedActions = [.. actionList];
+            settings.DefaultPreset = string.IsNullOrEmpty(_currentPreset)
+                ? "Default"
+                : _currentPreset;
 
             _core?.SaveSettings(_worker);
         }
@@ -368,6 +384,25 @@ namespace Observatory.Photographer.UI
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Information
             );
+        }
+
+        private void LoadPresetButton_Click(object sender, EventArgs e)
+        {
+            var presetForm = new PresetForm(_photoData);
+            var result = presetForm.ShowDialog();
+            if (result == DialogResult.OK)
+            {
+                _currentPreset = presetForm.PresetName;
+                UpdateUIFromActionList(presetForm.PresetAction);
+            }
+        }
+
+        private void SavePresetButton_Click(object sender, EventArgs e)
+        {
+            var presetForm = new PresetForm(_photoData, true) { PresetAction = BuildActionList() };
+            var result = presetForm.ShowDialog();
+            if (result == DialogResult.OK)
+                _currentPreset = presetForm.PresetName;
         }
     }
 }

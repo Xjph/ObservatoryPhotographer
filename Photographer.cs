@@ -17,8 +17,7 @@ namespace Observatory.Photographer
         private PhotoSettings _settings;
         private Dictionary<string, ImageWithMetadata> _imageData;
         private List<Task> _processingTasks = [];
-        private Dictionary<string, Status> _persistedStatus;
-        private readonly string _statusStoragePath;
+        private PhotoData _photoData;
 
         public Photographer(
             IObservatoryCore core,
@@ -39,9 +38,7 @@ namespace Observatory.Photographer
             _ui.PhotoListView.LargeImageList.ImageSize = new Size(256, 256);
             _settings = photoSettings;
             _imageData = [];
-            _persistedStatus = [];
-            _statusStoragePath = Path.Combine(_core.PluginStorageFolder, "screenshot_status.json");
-            LoadPersistedStatus();
+            _photoData = new(core);
             _ui.PhotoListView.SelectedIndexChanged += SelectedImageChanged;
         }
 
@@ -54,71 +51,19 @@ namespace Observatory.Photographer
                 );
         }
 
-        private static string BuildImageCaption(ImageWithMetadata metadata)
-        {
-            // Simple one-line title to display under thumbnail
-            // System - Body - Time with fallback to filename
-            StringBuilder caption = new();
-            if (!string.IsNullOrEmpty(metadata.Screenshot.System))
-            {
-                caption.Append(metadata.Screenshot.System);
-                if (!string.IsNullOrEmpty(metadata.Screenshot.Body))
-                {
-                    caption.Append(" - ");
-                    caption.Append(metadata.Screenshot.Body);
-                }
-                caption.Append(" - ");
-                caption.Append(metadata.Screenshot.TimestampDateTime.ToString("g"));
-            }
-            else
-            {
-                caption.Append(metadata.Screenshot.Filename.Split('\\').Last());
-            }
-
-            return caption.ToString();
-        }
-
-        private void LoadPersistedStatus()
-        {
-            if (File.Exists(_statusStoragePath))
-            {
-                try
-                {
-                    var json = File.ReadAllText(_statusStoragePath);
-                    _persistedStatus =
-                        JsonSerializer.Deserialize<Dictionary<string, Status>>(json) ?? [];
-                }
-                catch
-                {
-                    _persistedStatus = [];
-                }
-            }
-        }
-
-        private void SavePersistedStatus()
-        {
-            try
-            {
-                var json = JsonSerializer.Serialize(
-                    _persistedStatus,
-                    new JsonSerializerOptions { WriteIndented = true }
-                );
-                File.WriteAllText(_statusStoragePath, json);
-            }
-            catch
-            {
-                // Silently fail if unable to save
-            }
-        }
-
         private void TaskCleanup()
         {
             _processingTasks = [.. _processingTasks.Where(t => !t.IsCompleted)];
+            if (_processingTasks.Count == 1 && !_core.CurrentLogMonitorState.HasFlag(LogMonitorState.Batch))
+            {
+                UiExec(() => _ui.ShowProcessing(false));
+            }
         }
+
+        private void UiExec(Action action) => _core.ExecuteOnUIThread(action);
 
         public void HandleScreenshot(Screenshot screenshot)
         {
-            TaskCleanup();
             if (ProceedWithImport(_core.CurrentLogMonitorState))
             {
                 var picturesPath = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
@@ -135,14 +80,12 @@ namespace Observatory.Photographer
                         {
                             var file = new FileInfo(fullFilename);
 
-                            var uiExec = (Action action) => _core.ExecuteOnUIThread(action);
-
                             var largeImageKeys =
                                 _ui.PhotoListView.LargeImageList?.Images.Keys.Cast<string>()
                                     .ToList()
                                 ?? [];
                             List<ListViewItem> imageItems = [];
-                            uiExec(() =>
+                            UiExec(() =>
                                 imageItems = [.. _ui.PhotoListView.Items.Cast<ListViewItem>()]
                             );
 
@@ -154,7 +97,7 @@ namespace Observatory.Photographer
                                 );
                                 if (staleItem.Any())
                                 {
-                                    uiExec(() => _ui.PhotoListView.Items.Remove(staleItem.First()));
+                                    UiExec(() => _ui.PhotoListView.Items.Remove(staleItem.First()));
                                 }
                             }
                             else
@@ -163,7 +106,7 @@ namespace Observatory.Photographer
                                 int thumbWidth = 256;
                                 int thumbHeight = (int)Math.Floor(256 / aspect);
                                 var resized = MagickToBitmap(original, thumbWidth, thumbHeight);
-                                uiExec(() =>
+                                UiExec(() =>
                                 {
                                     _ui.PhotoListView.LargeImageList!.ImageSize = new Size(
                                         thumbWidth,
@@ -191,16 +134,16 @@ namespace Observatory.Photographer
                                 status = _core.GetStatus();
                                 if (status != null)
                                 {
-                                    _persistedStatus[fullFilename] = status;
-                                    SavePersistedStatus();
+                                    _photoData.ScreenshotStatus[fullFilename] = status;
+                                    _photoData.SaveStatus();
                                 }
                             }
                             else
                             {
-                                _persistedStatus.TryGetValue(fullFilename, out status);
+                                _photoData.ScreenshotStatus.TryGetValue(fullFilename, out status);
                             }
 
-                            uiExec(() =>
+                            UiExec(() =>
                                 _ui.PhotoListView.Items.Add(
                                     new ListViewItem(screenshot.System) { ImageKey = fullFilename }
                                 )
@@ -210,11 +153,12 @@ namespace Observatory.Photographer
                             if (ProceedWithProcessing(_core.CurrentLogMonitorState))
                             {
                                 ImageUtils.PerformPhotoActions(
-                                    GetSavedActions(),
+                                    GetDefaultActions(),
                                     _imageData[fullFilename]
                                 );
                             }
                         }
+                    TaskCleanup();
                     })
                 );
             }
@@ -227,21 +171,14 @@ namespace Observatory.Photographer
                 && _settings.ProcessDuringReadAll
             ) || (state.HasFlag(LogMonitorState.Realtime) && _settings.ProcessWhileMonitoring);
 
-        private IEnumerable<PhotoAction> GetSavedActions() =>
-            _settings.SavedActions.Select<object, PhotoAction>(action =>
-            {
-                var jsonAction = (JsonElement)action;
-                var actionType = (PhotoActionKind)jsonAction.GetProperty("Action").GetInt32();
-                return actionType switch
-                {
-                    PhotoActionKind.Save => jsonAction.Deserialize<SaveAction>()!,
-                    PhotoActionKind.Resize => jsonAction.Deserialize<ResizeAction>()!,
-                    PhotoActionKind.Caption => jsonAction.Deserialize<CaptionAction>()!,
-                    PhotoActionKind.Watermark => jsonAction.Deserialize<WatermarkAction>()!,
-                    PhotoActionKind.Meta => jsonAction.Deserialize<MetaAction>()!,
-                    _ => throw new InvalidOperationException("Unknown action type in settings"),
-                };
-            });
+        private IEnumerable<PhotoAction> GetDefaultActions()
+        {
+            _photoData.SavedPresets.TryGetValue(
+                _settings.DefaultPreset,
+                out IEnumerable<PhotoAction>? defaultActions
+            );
+            return defaultActions ?? [];
+        }
 
         public ImageWithMetadata? GetImageMetadata(string imageKey)
         {
@@ -265,7 +202,9 @@ namespace Observatory.Photographer
         private bool ProceedWithImport(LogMonitorState state)
         {
             var batchCheck =
-                _settings.ImportDuringReadAll || _settings.ProcessDuringReadAll || !state.HasFlag(LogMonitorState.Batch);
+                _settings.ImportDuringReadAll
+                || _settings.ProcessDuringReadAll
+                || !state.HasFlag(LogMonitorState.Batch);
             var realtimeCheck =
                 _settings.ProcessWhileMonitoring || !state.HasFlag(LogMonitorState.Realtime);
 
@@ -303,7 +242,10 @@ namespace Observatory.Photographer
             dataText.AppendLine($"Height: {screenshot.Height}");
             dataText.AppendLine($"File Size: {new FileInfo(fullFilename).Length}");
             dataText.AppendLine($"Full file path: {fullFilename}");
-            if (_imageData.TryGetValue(fullFilename, out ImageWithMetadata? metadata) && metadata.Status != null)
+            if (
+                _imageData.TryGetValue(fullFilename, out ImageWithMetadata? metadata)
+                && metadata.Status != null
+            )
             {
                 dataText.AppendLine();
                 dataText.AppendLine($"Extended Metadata Available");

@@ -32,7 +32,7 @@ namespace Observatory.Photographer
                 ProcessDuringReadAll = false,
                 ProcessWhileMonitoring = true,
                 SeparateOutput = false,
-                SavedActions = [],
+                DefaultPreset = string.Empty,
             };
 
             _mainPanel = new();
@@ -85,6 +85,20 @@ namespace Observatory.Photographer
             _mainPanel.Core = observatoryCore;
             _mainPanel.Worker = this;
             _mainPanel.Photographer = _photographer;
+        }
+
+        void IObservatoryWorker.LogMonitorStateChanged(LogMonitorStateChangedEventArgs eventArgs)
+        {
+            if (_settings.ProcessDuringReadAll && !eventArgs.PreviousState.HasFlag(LogMonitorState.Batch) && eventArgs.NewState.HasFlag(LogMonitorState.Batch))
+            {
+                _mainPanel.Core?.ExecuteOnUIThread(() => _mainPanel.ShowProcessing(true));
+            }
+
+            if (_settings.ProcessDuringReadAll && eventArgs.PreviousState.HasFlag(LogMonitorState.Batch) && !eventArgs.NewState.HasFlag(LogMonitorState.Batch))
+            {
+                _settings.ProcessDuringReadAll = false;
+                _mainPanel.Core?.SaveSettings(this);
+            }
         }
 
         internal string CmdrName { get; set; } = "CMDR";

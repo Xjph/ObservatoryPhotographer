@@ -11,7 +11,24 @@ namespace Observatory.Photographer
         public bool ImportDuringReadAll { get; set; }
 
         [SettingDisplayName("Process During Read All")]
-        public bool ProcessDuringReadAll { get; set; }
+        public bool ProcessDuringReadAll {
+            get => _processDuringReadAll;
+            set
+            {
+                if (value)
+                {
+                    MessageBox.Show(
+                        "\"Process During Read All\" is resource intensive and may cause performance degradation during the read all operation." + Environment.NewLine + 
+                        "Depending on the number of screenshots and the specifications of your computer it may take up to several minutes to complete." + Environment.NewLine + Environment.NewLine + 
+                        "This setting will automatically disable after the next Read All operation finishes.",
+                        "Warning",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning
+                    );
+                }
+                _processDuringReadAll = value;
+            }
+        }
 
         [SettingDisplayName("Separate Output")]
         public bool SeparateOutput { get; set; }
@@ -39,6 +56,8 @@ namespace Observatory.Photographer
         public required string OutputLocationPath { get; set; }
 
         [SettingIgnore]
-        public object[] SavedActions { get; set; } = [];
+        public required string DefaultPreset { get; set; }
+
+        private bool _processDuringReadAll;
     }
 }

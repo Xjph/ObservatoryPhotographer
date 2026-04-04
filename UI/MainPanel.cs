@@ -18,6 +18,19 @@ namespace Observatory.Photographer.UI
         public Label DataLabel => InfoLabel;
         public ListView PhotoListView => PhotoView;
 
+        public void ShowProcessing(bool show)
+        {
+            Core?.ExecuteOnUIThread(() =>
+            {
+                ProcessingLabel.Enabled = show;
+                ProcessingLabel.Visible = show;
+                if (show)
+                    ProcessingLabel.BringToFront();
+                else                    
+                    ProcessingLabel.SendToBack();
+            });
+        }
+
         private void ProcessButton_Click(object sender, EventArgs e)
         {
             if (PhotoView.SelectedItems.Count > 0)
