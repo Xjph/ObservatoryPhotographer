@@ -54,7 +54,10 @@ namespace Observatory.Photographer
         private void TaskCleanup()
         {
             _processingTasks = [.. _processingTasks.Where(t => !t.IsCompleted)];
-            if (_processingTasks.Count == 1 && !_core.CurrentLogMonitorState.HasFlag(LogMonitorState.Batch))
+            if (
+                _processingTasks.Count == 1
+                && !_core.CurrentLogMonitorState.HasFlag(LogMonitorState.Batch)
+            )
             {
                 UiExec(() => _ui.ShowProcessing(false));
             }
@@ -158,7 +161,7 @@ namespace Observatory.Photographer
                                 );
                             }
                         }
-                    TaskCleanup();
+                        TaskCleanup();
                     })
                 );
             }

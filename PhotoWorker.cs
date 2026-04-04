@@ -89,12 +89,20 @@ namespace Observatory.Photographer
 
         void IObservatoryWorker.LogMonitorStateChanged(LogMonitorStateChangedEventArgs eventArgs)
         {
-            if (_settings.ProcessDuringReadAll && !eventArgs.PreviousState.HasFlag(LogMonitorState.Batch) && eventArgs.NewState.HasFlag(LogMonitorState.Batch))
+            if (
+                _settings.ProcessDuringReadAll
+                && !eventArgs.PreviousState.HasFlag(LogMonitorState.Batch)
+                && eventArgs.NewState.HasFlag(LogMonitorState.Batch)
+            )
             {
                 _mainPanel.Core?.ExecuteOnUIThread(() => _mainPanel.ShowProcessing(true));
             }
 
-            if (_settings.ProcessDuringReadAll && eventArgs.PreviousState.HasFlag(LogMonitorState.Batch) && !eventArgs.NewState.HasFlag(LogMonitorState.Batch))
+            if (
+                _settings.ProcessDuringReadAll
+                && eventArgs.PreviousState.HasFlag(LogMonitorState.Batch)
+                && !eventArgs.NewState.HasFlag(LogMonitorState.Batch)
+            )
             {
                 _settings.ProcessDuringReadAll = false;
                 _mainPanel.Core?.SaveSettings(this);

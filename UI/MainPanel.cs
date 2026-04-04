@@ -26,7 +26,7 @@ namespace Observatory.Photographer.UI
                 ProcessingLabel.Visible = show;
                 if (show)
                     ProcessingLabel.BringToFront();
-                else                    
+                else
                     ProcessingLabel.SendToBack();
             });
         }
