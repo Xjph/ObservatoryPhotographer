@@ -37,6 +37,9 @@ namespace Observatory.Photographer
         [SettingDisplayName("Separate Output")]
         public bool SeparateOutput { get; set; }
 
+        [SettingDisplayName("Allow Timestamp Mismatch")]
+        public bool AllowTimestampMismatch { get; set; }
+
         [SettingDisplayName("Screenshot Location")]
         [System.Text.Json.Serialization.JsonIgnore]
         public DirectoryInfo ScreenshotLocation

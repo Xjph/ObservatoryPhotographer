@@ -70,19 +70,12 @@ namespace Observatory.Photographer
             if (ProceedWithImport(_core.CurrentLogMonitorState))
             {
                 var picturesPath = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
-                var filename = screenshot.Filename
-                // .Replace("\\\\", "\\")
-                .Replace("\\ED_Pictures", string.Empty);
 
-                var fullFilename = FindImagePath(filename);
-
-                _processingTasks.Add(
-                    Task.Run(() =>
-                    {
-                        if (!string.IsNullOrEmpty(fullFilename))
+                var file = FindImage(screenshot);
+                if (file != null)
+                    _processingTasks.Add(
+                        Task.Run(() =>
                         {
-                            var file = new FileInfo(fullFilename);
-
                             var largeImageKeys =
                                 _ui.PhotoListView.LargeImageList?.Images.Keys.Cast<string>()
                                     .ToList()
@@ -92,11 +85,11 @@ namespace Observatory.Photographer
                                 imageItems = [.. _ui.PhotoListView.Items.Cast<ListViewItem>()]
                             );
 
-                            MagickImage original = new(fullFilename);
-                            if (largeImageKeys.Contains(fullFilename))
+                            MagickImage original = new(file.FullName);
+                            if (largeImageKeys.Contains(file.FullName))
                             {
                                 var staleItem = imageItems.Where(item =>
-                                    item.ImageKey == fullFilename
+                                    item.ImageKey == file.FullName
                                 );
                                 if (staleItem.Any())
                                 {
@@ -116,7 +109,7 @@ namespace Observatory.Photographer
                                         thumbHeight
                                     );
                                     _ui.PhotoListView.LargeImageList!.Images.Add(
-                                        fullFilename,
+                                        file.FullName,
                                         resized
                                     );
                                 });
@@ -137,33 +130,33 @@ namespace Observatory.Photographer
                                 status = _core.GetStatus();
                                 if (status != null)
                                 {
-                                    _photoData.ScreenshotStatus[fullFilename] = status;
+                                    _photoData.ScreenshotStatus[file.FullName] = status;
                                     _photoData.SaveStatus();
                                 }
                             }
                             else
                             {
-                                _photoData.ScreenshotStatus.TryGetValue(fullFilename, out status);
+                                _photoData.ScreenshotStatus.TryGetValue(file.FullName, out status);
                             }
 
                             UiExec(() =>
                                 _ui.PhotoListView.Items.Add(
-                                    new ListViewItem(screenshot.System) { ImageKey = fullFilename }
+                                    new ListViewItem(screenshot.System) { ImageKey = file.FullName }
                                 )
                             );
-                            _imageData[fullFilename] = new(original, screenshot, status);
+                            _imageData[file.FullName] = new(original, screenshot, status);
 
                             if (ProceedWithProcessing(_core.CurrentLogMonitorState))
                             {
                                 ImageUtils.PerformPhotoActions(
                                     GetDefaultActions(),
-                                    _imageData[fullFilename]
+                                    _imageData[file.FullName]
                                 );
                             }
-                        }
-                        TaskCleanup();
-                    })
-                );
+                            
+                            TaskCleanup();
+                        })
+                    );
             }
         }
 
@@ -277,14 +270,20 @@ namespace Observatory.Photographer
                 return "NW";
         }
 
-        private string FindImagePath(string initialPath)
+        private FileInfo? FindImage(Screenshot screenshot)
         {
-            if (CheckAndSetPath(ref initialPath))
+            var filename = screenshot.Filename
+                .Replace("\\ED_Pictures", string.Empty);
+
+            if (CheckAndSetPath(ref filename))
             {
-                return initialPath;
+                if (!_settings.AllowTimestampMismatch && 
+                    Math.Abs((screenshot.TimestampDateTime - File.GetCreationTimeUtc(filename)).TotalDays) > 1)
+                    return null;
+                return new FileInfo(filename);
             }
 
-            return string.Empty;
+            return null;
         }
 
         private bool CheckAndSetPath(ref string filename)
