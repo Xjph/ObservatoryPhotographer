@@ -86,7 +86,7 @@ namespace Observatory.Photographer
                                 imageItems = [.. _ui.PhotoListView.Items.Cast<ListViewItem>()]
                             );
 
-                            MagickImage original = new(file.FullName);
+                            using MagickImage original = new(file.FullName);
                             if (largeImageKeys.Contains(file.FullName))
                             {
                                 var staleItem = imageItems.Where(item =>

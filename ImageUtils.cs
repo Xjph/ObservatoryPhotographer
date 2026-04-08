@@ -91,20 +91,31 @@ namespace Observatory.Photographer
 
             foreach (var action in actions)
             {
-                switch (action)
+                try
                 {
-                    case WatermarkAction watermarkAction:
-                        AddWatermarkToImage(watermarkAction, imageData);
-                        break;
-                    case CaptionAction captionAction:
-                        AddTextToImage(captionAction, imageData);
-                        break;
-                    case ResizeAction sizeAction:
-                        Resize(sizeAction, imageData);
-                        break;
-                    case SaveAction saveAction:
-                        SaveImage(saveAction, imageData);
-                        break;
+                    switch (action)
+                    {
+                        case WatermarkAction watermarkAction:
+                            AddWatermarkToImage(watermarkAction, imageData);
+                            break;
+                        case CaptionAction captionAction:
+                            AddTextToImage(captionAction, imageData);
+                            break;
+                        case ResizeAction sizeAction:
+                            Resize(sizeAction, imageData);
+                            break;
+                        case SaveAction saveAction:
+                            SaveImage(saveAction, imageData);
+                            break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // Additional context for exception logging at call site
+                    throw new Exception(
+                        $"Error performing action {action.Action} on image {imageData.Screenshot.Filename}",
+                        ex
+                    );
                 }
             }
         }
@@ -522,7 +533,26 @@ namespace Observatory.Photographer
 
             int x,
                 y;
-            MagickImage watermark = new(action.WatermarkImagePath);
+
+            MagickImage watermark;
+
+            try
+            {
+                watermark = new(action.WatermarkImagePath);
+            }
+            catch (Exception ex)
+            {
+                // Show message box that watermark failed to load so user can correct.
+                MessageBox.Show(
+                    $"Failed to load watermark image from path: {action.WatermarkImagePath}\n{ex.Message}",
+                    "Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error
+                );
+
+                // Rethrow for higher level logging and to halt further processing.
+                throw new Exception($"Failed to load watermark image from path: {action.WatermarkImagePath}", ex);
+            }
 
             if (action.LocationMethod == LocationMethod.Manual)
             {
@@ -551,6 +581,8 @@ namespace Observatory.Photographer
                     imageData.Overlay.Composite(watermark, gravity);
                 }
             }
+
+            watermark.Dispose();
         }
 
         public static MagickImage DrawBox(MagickImage image, Rectangle bounds)
