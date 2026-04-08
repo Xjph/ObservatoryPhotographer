@@ -10,6 +10,7 @@ namespace Observatory.Photographer
         {
             Image = image;
             Screenshot = screenshot;
+            Overlay = new MagickImage(MagickColors.Transparent, image.Width, image.Height);
         }
 
         public ImageWithMetadata(MagickImage image, Screenshot screenshot, Status? status)
@@ -17,6 +18,7 @@ namespace Observatory.Photographer
             Image = image;
             Screenshot = screenshot;
             Status = status;
+            Overlay = new MagickImage(MagickColors.Transparent, image.Width, image.Height);
         }
 
         public bool HasStatus => Status is not null;
@@ -28,5 +30,7 @@ namespace Observatory.Photographer
         public Status? Status { get; private set; }
 
         public MagickImage Image { get; private set; }
+
+        public MagickImage Overlay { get; private set; }
     }
 }

@@ -13,7 +13,6 @@ namespace Observatory.Photographer.UI
         private WatermarkAction _watermarkAction;
         private SaveAction _saveAction;
         private ResizeAction _resizeAction;
-        private MetaAction _metaAction;
         private readonly IObservatoryCore? _core;
         private readonly PhotoData _photoData;
         private readonly PhotoWorker? _worker;
@@ -30,6 +29,8 @@ namespace Observatory.Photographer.UI
                 FolderPath = ((PhotoSettings)worker.Settings).OutputLocationPath,
                 FilePattern = "image",
                 CmdrName = worker?.CmdrName ?? "CMDR",
+                IncludeMetadata = false,
+                SeparateOutput = false,
             };
             _resizeAction = new()
             {
@@ -39,7 +40,6 @@ namespace Observatory.Photographer.UI
             };
             _captionForm = new(_captionAction);
             _watermarkForm = new(_watermarkAction);
-            _metaAction = new();
             _core = core;
             _worker = worker;
             _photoData = new(core);
@@ -48,6 +48,10 @@ namespace Observatory.Photographer.UI
             CancelButton = CancelBtn;
             InitializeComponent();
             RestoreSavedProcess();
+            FilenameTooltip.SetToolTip(
+                ExampleLabel,
+                string.Empty
+            );
         }
 
         private void UpdateUIFromActionList(IEnumerable<PhotoAction> actionList)
@@ -59,6 +63,7 @@ namespace Observatory.Photographer.UI
                     case SaveAction saveAction:
                         _saveAction = saveAction;
                         FilenameTextbox.Text = saveAction.FilePattern;
+                        MetadataCheckbox.Checked = saveAction.IncludeMetadata;
                         switch (saveAction.Format)
                         {
                             case MagickFormat.Jpeg:
@@ -113,10 +118,6 @@ namespace Observatory.Photographer.UI
                             ResizeXSpinner.Value = resizeAction.X;
                             ResizeYSpinner.Value = resizeAction.Y;
                         }
-                        break;
-                    case MetaAction metaAction:
-                        _metaAction = metaAction;
-                        MetadataCheckbox.Checked = true;
                         break;
                 }
             }
@@ -193,9 +194,6 @@ namespace Observatory.Photographer.UI
 
             if (ResizeCheckbox.Checked)
                 actionList.Add(_resizeAction);
-
-            if (MetadataCheckbox.Checked)
-                actionList.Add(_metaAction);
 
             actionList.Add(_saveAction);
 
@@ -298,6 +296,10 @@ namespace Observatory.Photographer.UI
                 FilenameTextbox.Text,
                 _image,
                 _saveAction.CmdrName
+            );
+            FilenameTooltip.SetToolTip(
+                ExampleLabel,
+                ExampleLabel.Text
             );
         }
 
@@ -403,6 +405,16 @@ namespace Observatory.Photographer.UI
             var result = presetForm.ShowDialog();
             if (result == DialogResult.OK)
                 _currentPreset = presetForm.PresetName;
+        }
+
+        private void MetadataCheckbox_CheckedChanged(object sender, EventArgs e)
+        {
+            _saveAction.IncludeMetadata = MetadataCheckbox.Checked;
+        }
+
+        private void SeparateCheckbox_CheckedChanged(object sender, EventArgs e)
+        {
+            _saveAction.SeparateOutput = SeparateCheckbox.Checked;
         }
     }
 }

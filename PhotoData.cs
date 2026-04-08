@@ -81,7 +81,6 @@ namespace Observatory.Photographer
                             PhotoActionKind.Resize => jsonAction.Deserialize<ResizeAction>()!,
                             PhotoActionKind.Caption => jsonAction.Deserialize<CaptionAction>()!,
                             PhotoActionKind.Watermark => jsonAction.Deserialize<WatermarkAction>()!,
-                            PhotoActionKind.Meta => jsonAction.Deserialize<MetaAction>()!,
                             _ => throw new InvalidOperationException(
                                 "Unknown action type in settings"
                             ),

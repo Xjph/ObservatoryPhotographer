@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
             ResizeCheckbox = new CheckBox();
             ConvertDropdown = new ComboBox();
             ResizeFixed = new RadioButton();
@@ -58,6 +59,8 @@
             ProcessingLabel = new Label();
             LoadPresetButton = new Button();
             SavePresetButton = new Button();
+            FilenameTooltip = new ToolTip(components);
+            SeparateCheckbox = new CheckBox();
             ResizePanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)ResizePercentSpinner).BeginInit();
             ((System.ComponentModel.ISupportInitialize)ResizeYSpinner).BeginInit();
@@ -296,6 +299,7 @@
             MetadataCheckbox.TabIndex = 16;
             MetadataCheckbox.Text = "Embed Metadata";
             MetadataCheckbox.UseVisualStyleBackColor = true;
+            MetadataCheckbox.CheckedChanged += MetadataCheckbox_CheckedChanged;
             // 
             // FilenameLabel
             // 
@@ -326,6 +330,7 @@
             FilenameTextbox.Name = "FilenameTextbox";
             FilenameTextbox.Size = new Size(298, 23);
             FilenameTextbox.TabIndex = 19;
+            FilenameTextbox.WordWrap = false;
             FilenameTextbox.TextChanged += FilenameTextbox_TextChanged;
             // 
             // ExampleBox
@@ -395,11 +400,23 @@
             SavePresetButton.UseVisualStyleBackColor = true;
             SavePresetButton.Click += SavePresetButton_Click;
             // 
+            // SeparateCheckbox
+            // 
+            SeparateCheckbox.AutoSize = true;
+            SeparateCheckbox.Location = new Point(134, 285);
+            SeparateCheckbox.Name = "SeparateCheckbox";
+            SeparateCheckbox.Size = new Size(112, 19);
+            SeparateCheckbox.TabIndex = 25;
+            SeparateCheckbox.Text = "Separate Output";
+            SeparateCheckbox.UseVisualStyleBackColor = true;
+            SeparateCheckbox.CheckedChanged += SeparateCheckbox_CheckedChanged;
+            // 
             // ProcessForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(324, 468);
+            Controls.Add(SeparateCheckbox);
             Controls.Add(SavePresetButton);
             Controls.Add(LoadPresetButton);
             Controls.Add(FormatLabel);
@@ -468,5 +485,7 @@
         private Label ProcessingLabel;
         private Button LoadPresetButton;
         private Button SavePresetButton;
+        private ToolTip FilenameTooltip;
+        private CheckBox SeparateCheckbox;
     }
 }

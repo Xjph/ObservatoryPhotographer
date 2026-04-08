@@ -89,8 +89,6 @@ namespace Observatory.Photographer
             if (!actions.Any() || actions.Last().Action != PhotoActionKind.Save)
                 throw new ArgumentException("Final Action Must Be SaveAction");
 
-            bool embedMeta = false;
-
             foreach (var action in actions)
             {
                 switch (action)
@@ -104,12 +102,8 @@ namespace Observatory.Photographer
                     case ResizeAction sizeAction:
                         Resize(sizeAction, imageData);
                         break;
-                    case MetaAction metaAction:
-                        embedMeta = true;
-                        // EmbedMetadata(metaAction);
-                        break;
                     case SaveAction saveAction:
-                        SaveImage(saveAction, imageData, embedMeta);
+                        SaveImage(saveAction, imageData);
                         break;
                 }
             }
@@ -508,10 +502,10 @@ namespace Observatory.Photographer
                         1 => Gravity.Northeast,
                         _ => Gravity.Northwest,
                     };
-                    imageData.Image.Composite(caption, gravity, CompositeOperator.Over);
+                    imageData.Overlay.Composite(caption, gravity, CompositeOperator.Over);
                 }
             }
-            imageData.Image.Composite(caption, x, y, CompositeOperator.Over);
+            imageData.Overlay.Composite(caption, x, y, CompositeOperator.Over);
         }
 
         public static void AddWatermarkToImage(WatermarkAction action, ImageWithMetadata imageData)
@@ -534,7 +528,7 @@ namespace Observatory.Photographer
             {
                 x = action.Location.X;
                 y = action.Location.Y;
-                imageData.Image.Composite(watermark, x, y);
+                imageData.Overlay.Composite(watermark, x, y);
             }
             else
             {
@@ -543,7 +537,7 @@ namespace Observatory.Photographer
                     var bounds = GetBoundsFromQuad(imageData.Image, quad, action.SecondOrder);
                     x = bounds.X;
                     y = bounds.Y;
-                    imageData.Image.Composite(watermark, x, y);
+                    imageData.Overlay.Composite(watermark, x, y);
                 }
                 else
                 {
@@ -554,7 +548,7 @@ namespace Observatory.Photographer
                         1 => Gravity.Northeast,
                         _ => Gravity.Northwest,
                     };
-                    imageData.Image.Composite(watermark, gravity);
+                    imageData.Overlay.Composite(watermark, gravity);
                 }
             }
         }
@@ -573,34 +567,47 @@ namespace Observatory.Photographer
         public static void Resize(ResizeAction sizeAction, ImageWithMetadata imageData)
         {
             var image = imageData.Image;
+            var overlay = imageData.Overlay;
             if (sizeAction.Relative)
             {
                 // Relative scaling stores percentage in sizeAction.X, ignore sizeAction.Y
                 uint newHeight = (uint)(image.Height * (sizeAction.X / 100f));
                 uint newWidth = (uint)(image.Width * (sizeAction.X / 100f));
                 image.Resize(newWidth, newHeight);
+                overlay.Resize(newWidth, newHeight);
             }
             else
             {
                 image.Resize((uint)sizeAction.X, (uint)sizeAction.Y);
+                overlay.Resize((uint)sizeAction.X, (uint)sizeAction.Y);
             }
         }
 
-        public static void SaveImage(SaveAction action, ImageWithMetadata imageData, bool embedMeta)
+        public static void SaveImage(SaveAction action, ImageWithMetadata imageData)
         {
-            if (embedMeta)
+            if (action.IncludeMetadata)
             {
                 EmbedMeta(imageData, action);
             }
 
             var image = imageData.Image;
-            image.Format = action.Format;
-            image.Quality = action.Quality;
+            var overlay = imageData.Overlay;
+
             var filename = FillTokenizedString(action.FilePattern, imageData, action.CmdrName);
             var sanitizedCharacters = filename
                 .Where(c => !Path.GetInvalidFileNameChars().Contains(c))
                 .ToArray();
             filename = new string(sanitizedCharacters);
+
+            if (!action.SeparateOutput)
+            {
+                imageData.Image.Composite(imageData.Overlay, CompositeOperator.Over);
+            }
+            else
+            {
+                imageData.Overlay.Format = MagickFormat.Png;
+                imageData.Overlay.Write(Path.Combine(action.FolderPath, $"{filename}_overlay.png"));
+            }
 
             var (extension, validExtensions) = action.Format switch
             {
@@ -621,8 +628,10 @@ namespace Observatory.Photographer
                 filename += extension;
             }
 
-            var fullPath = action.FolderPath + Path.DirectorySeparatorChar + filename;
+            var fullPath = Path.Combine(action.FolderPath, filename);
 
+            image.Format = action.Format;
+            image.Quality = action.Quality;
             image.Write(fullPath);
         }
 

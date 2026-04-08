@@ -8,8 +8,7 @@ namespace Observatory.Photographer
         Save,
         Resize,
         Caption,
-        Watermark,
-        Meta,
+        Watermark
     }
 
     public enum LocationMethod
@@ -24,19 +23,10 @@ namespace Observatory.Photographer
     [JsonDerivedType(typeof(ResizeAction), (int)PhotoActionKind.Resize)]
     [JsonDerivedType(typeof(CaptionAction), (int)PhotoActionKind.Caption)]
     [JsonDerivedType(typeof(WatermarkAction), (int)PhotoActionKind.Watermark)]
-    [JsonDerivedType(typeof(MetaAction), (int)PhotoActionKind.Meta)]
     public abstract class PhotoAction
     {
         public abstract PhotoActionKind Action { get; }
         // public required ImageWithMetadata Metadata { get; set; }
-    }
-
-    public class MetaAction : PhotoAction
-    {
-        public override PhotoActionKind Action
-        {
-            get => PhotoActionKind.Meta;
-        }
     }
 
     public class SaveAction : PhotoAction
@@ -50,6 +40,8 @@ namespace Observatory.Photographer
         public required string FolderPath { get; set; }
         public required string FilePattern { get; set; }
         public required string CmdrName { get; set; }
+        public required bool IncludeMetadata { get; set; }
+        public required bool SeparateOutput { get; set; }
     }
 
     public class ResizeAction : PhotoAction

@@ -13,17 +13,14 @@ namespace Observatory.Photographer
 
         public PhotoWorker()
         {
-            var defaultScreenshotLocation =
-                Environment.GetFolderPath(Environment.SpecialFolder.MyPictures)
-                + Path.DirectorySeparatorChar
-                + "Frontier Developments"
-                + Path.DirectorySeparatorChar
-                + "Elite Dangerous";
+            var defaultScreenshotLocation = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.MyPictures),
+                "Frontier Developments",
+                "Elite Dangerous");
 
-            var defaultOutputLocation =
-                Environment.GetFolderPath(Environment.SpecialFolder.MyPictures)
-                + Path.DirectorySeparatorChar
-                + "Elite Observatory Screenshots";
+            var defaultOutputLocation = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.MyPictures),
+                "Elite Observatory Screenshots");
 
             _settings = new()
             {
@@ -31,7 +28,6 @@ namespace Observatory.Photographer
                 OutputLocationPath = defaultOutputLocation,
                 ProcessDuringReadAll = false,
                 ProcessWhileMonitoring = true,
-                SeparateOutput = false,
                 DefaultPreset = string.Empty,
             };
 
