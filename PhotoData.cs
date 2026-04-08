@@ -91,7 +91,7 @@ namespace Observatory.Photographer
                     catch (Exception ex)
                     {
                         // If deserialization fails for any reason, skip this action.
-                        _errorLogger?.Invoke(ex, "Failed to deserialize photo action.");
+                        _errorLogger(ex, "Failed to deserialize photo action.");
                         return null!;
                     }
                 })
@@ -105,7 +105,7 @@ namespace Observatory.Photographer
             }
             catch (Exception ex)
             {
-                _errorLogger?.Invoke(ex, "Failed to deserialize photographer JSON data.");
+                _errorLogger(ex, "Failed to deserialize photographer JSON data.");
                 return default;
             }
         }

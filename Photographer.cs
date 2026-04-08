@@ -154,7 +154,12 @@ namespace Observatory.Photographer
                                     _imageData[file.FullName]
                                 );
                             }
-                            
+                        }).ContinueWith(t =>
+                        {
+                            if (t.Exception != null)
+                            {
+                                Errorlogger(t.Exception, $"Error processing screenshot {file.FullName}");
+                            }
                             TaskCleanup();
                         })
                     );

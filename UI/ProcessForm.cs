@@ -142,7 +142,7 @@ namespace Observatory.Photographer.UI
             }
             catch (Exception ex) 
             {
-                _mainPanel?.Photographer?.Errorlogger.Invoke(ex, "Failed to restore saved process.");
+                _mainPanel?.Photographer?.Errorlogger(ex, "Failed to restore saved process.");
                 actionList = [];
             }
 
@@ -168,6 +168,12 @@ namespace Observatory.Photographer.UI
             {
                 ImageUtils.PerformPhotoActions(BuildActionList(), _image);
                 _core?.ExecuteOnUIThread(() => Close());
+            }).ContinueWith(t =>
+            {
+                if (t.Exception != null)
+                {
+                    _mainPanel?.Photographer?.Errorlogger(t.Exception, "Error performing photo actions.");
+                }
             });
         }
 
