@@ -42,7 +42,7 @@ namespace Observatory.Photographer.UI
             _watermarkForm = new(_watermarkAction);
             _core = core;
             _worker = worker;
-            _photoData = new(core);
+            _photoData = new(core, core.GetPluginErrorLogger(worker));
             core?.RegisterControl(_captionForm);
             core?.RegisterControl(_watermarkForm);
             CancelButton = CancelBtn;
@@ -140,8 +140,9 @@ namespace Observatory.Photographer.UI
                 );
                 actionList = defaultActions ?? [];
             }
-            catch
+            catch (Exception ex) 
             {
+                _mainPanel?.Photographer?.Errorlogger.Invoke(ex, "Failed to restore saved process.");
                 actionList = [];
             }
 

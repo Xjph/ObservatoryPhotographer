@@ -6,14 +6,16 @@ namespace Observatory.Photographer
 {
     public class PhotoData
     {
-        public PhotoData(IObservatoryCore core)
+        public PhotoData(IObservatoryCore core, Action<Exception, string> errorLogger)
         {
             _core = core;
+            _errorLogger = errorLogger;
             ScreenshotStatus = LoadPersistedStatus();
             SavedPresets = LoadSavedPresets();
         }
 
         private IObservatoryCore _core { get; init; }
+        private Action<Exception, string> _errorLogger { get; }
         private string _statusStoragePath =>
             Path.Combine(_core.PluginStorageFolder, "screenshot_status.json");
         private string _presetsStoragePath =>
@@ -66,7 +68,7 @@ namespace Observatory.Photographer
             return savedActions.ToDictionary(kvp => kvp.Key, kvp => DeserializeActions(kvp.Value));
         }
 
-        private static IEnumerable<PhotoAction> DeserializeActions(object[] actions) =>
+        private IEnumerable<PhotoAction> DeserializeActions(object[] actions) =>
             actions
                 .Select<object, PhotoAction>(action =>
                 {
@@ -86,22 +88,24 @@ namespace Observatory.Photographer
                             ),
                         };
                     }
-                    catch
+                    catch (Exception ex)
                     {
                         // If deserialization fails for any reason, skip this action.
+                        _errorLogger?.Invoke(ex, "Failed to deserialize photo action.");
                         return null!;
                     }
                 })
                 .Where(action => action != null)!;
 
-        private static T? DeserializeOrDefault<T>(string json)
+        private T? DeserializeOrDefault<T>(string json)
         {
             try
             {
                 return JsonSerializer.Deserialize<T>(json);
             }
-            catch
+            catch (Exception ex)
             {
+                _errorLogger?.Invoke(ex, "Failed to deserialize photographer JSON data.");
                 return default;
             }
         }

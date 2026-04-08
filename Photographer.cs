@@ -11,23 +11,24 @@ namespace Observatory.Photographer
     public class Photographer
     {
         private IObservatoryCore _core;
-        private PhotoWorker _worker;
         private UI.MainPanel _ui;
         private ImageList _imageList;
         private PhotoSettings _settings;
         private Dictionary<string, ImageWithMetadata> _imageData;
         private List<Task> _processingTasks = [];
         private PhotoData _photoData;
+        public readonly Action<Exception, string> Errorlogger;
 
         public Photographer(
             IObservatoryCore core,
             PhotoWorker worker,
             UI.MainPanel ui,
-            PhotoSettings photoSettings
+            PhotoSettings photoSettings,
+            Action<Exception, string> errorLogger
         )
         {
             _core = core;
-            _worker = worker;
+            Errorlogger = errorLogger;
             _ui = ui;
             ui.Core = core;
             ui.Photographer = this;
@@ -38,7 +39,7 @@ namespace Observatory.Photographer
             _ui.PhotoListView.LargeImageList.ImageSize = new Size(256, 256);
             _settings = photoSettings;
             _imageData = [];
-            _photoData = new(core);
+            _photoData = new(core, errorLogger);
             _ui.PhotoListView.SelectedIndexChanged += SelectedImageChanged;
         }
 

@@ -77,7 +77,7 @@ namespace Observatory.Photographer
 
         void IObservatoryPlugin.Load(IObservatoryCore observatoryCore)
         {
-            _photographer = new(observatoryCore, this, _mainPanel, _settings);
+            _photographer = new(observatoryCore, this, _mainPanel, _settings, observatoryCore.GetPluginErrorLogger(this));
             _mainPanel.Core = observatoryCore;
             _mainPanel.Worker = this;
             _mainPanel.Photographer = _photographer;
