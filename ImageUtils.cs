@@ -489,20 +489,16 @@ namespace Observatory.Photographer
                 quad = action.SecondOrder ? (int)action.SecondOrderQuad : (int)action.Quad;
             }
 
-            int x = 0,
-                y = 0;
             if (action.LocationMethod == LocationMethod.Manual)
             {
-                x = action.Location.X;
-                y = action.Location.Y;
+                imageData.Overlay.Composite(caption, action.Location.X, action.Location.Y, CompositeOperator.Over);
             }
             else
             {
                 if (action.SecondOrder)
                 {
                     var bounds = GetBoundsFromQuad(imageData.Image, quad, action.SecondOrder);
-                    x = bounds.X;
-                    y = bounds.Y;
+                    imageData.Overlay.Composite(caption, bounds.X, bounds.Y, CompositeOperator.Over);
                 }
                 else
                 {
@@ -516,7 +512,7 @@ namespace Observatory.Photographer
                     imageData.Overlay.Composite(caption, gravity, CompositeOperator.Over);
                 }
             }
-            imageData.Overlay.Composite(caption, x, y, CompositeOperator.Over);
+            
         }
 
         public static void AddWatermarkToImage(WatermarkAction action, ImageWithMetadata imageData)
@@ -542,14 +538,6 @@ namespace Observatory.Photographer
             }
             catch (Exception ex)
             {
-                // Show message box that watermark failed to load so user can correct.
-                MessageBox.Show(
-                    $"Failed to load watermark image from path: {action.WatermarkImagePath}\n{ex.Message}",
-                    "Error",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error
-                );
-
                 // Rethrow for higher level logging and to halt further processing.
                 throw new Exception($"Failed to load watermark image from path: {action.WatermarkImagePath}", ex);
             }
@@ -583,17 +571,6 @@ namespace Observatory.Photographer
             }
 
             watermark.Dispose();
-        }
-
-        public static MagickImage DrawBox(MagickImage image, Rectangle bounds)
-        {
-            var d = new Drawables()
-                .FillColor(MagickColors.Transparent)
-                .StrokeColor(MagickColors.OrangeRed)
-                .StrokeWidth(5)
-                .Rectangle(bounds.X, bounds.Y, bounds.X + bounds.Width, bounds.Y + bounds.Height);
-            image.Draw(d);
-            return image;
         }
 
         public static void Resize(ResizeAction sizeAction, ImageWithMetadata imageData)

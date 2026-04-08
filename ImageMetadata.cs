@@ -4,7 +4,7 @@ using Observatory.Framework.Files.Journal;
 
 namespace Observatory.Photographer
 {
-    public class ImageWithMetadata
+    public class ImageWithMetadata : IDisposable
     {
         public ImageWithMetadata(MagickImage image, Screenshot screenshot)
         {
@@ -32,5 +32,12 @@ namespace Observatory.Photographer
         public MagickImage Image { get; private set; }
 
         public MagickImage Overlay { get; private set; }
+
+        public void Dispose()
+        {
+            Image.Dispose();
+            Overlay.Dispose();
+            GC.SuppressFinalize(this);
+        }
     }
 }

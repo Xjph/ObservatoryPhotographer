@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Collections.Concurrent;
+using System.Text;
 using System.Text.Json;
 using ImageMagick;
 using Observatory.Framework;
@@ -15,7 +16,7 @@ namespace Observatory.Photographer
         private ImageList _imageList;
         private PhotoSettings _settings;
         private Dictionary<string, ImageWithMetadata> _imageData;
-        private List<Task> _processingTasks = [];
+        private ConcurrentBag<Task> _processingTasks = [];
         private PhotoData _photoData;
         public readonly Action<Exception, string> Errorlogger;
 
@@ -66,6 +67,17 @@ namespace Observatory.Photographer
 
         private void UiExec(Action action) => _core.ExecuteOnUIThread(action);
 
+        public void Clear()
+        {
+            _imageData.Values.ToList().ForEach(data => data.Dispose());
+            _imageData.Clear();
+            UiExec(() =>
+            {
+                _ui.PhotoListView.Items.Clear();
+                _ui.PhotoListView.LargeImageList?.Images.Clear();
+            });
+        }
+
         public void HandleScreenshot(Screenshot screenshot)
         {
             if (ProceedWithImport(_core.CurrentLogMonitorState))
@@ -86,7 +98,7 @@ namespace Observatory.Photographer
                                 imageItems = [.. _ui.PhotoListView.Items.Cast<ListViewItem>()]
                             );
 
-                            using MagickImage original = new(file.FullName);
+                            MagickImage original = new(file.FullName);
                             if (largeImageKeys.Contains(file.FullName))
                             {
                                 var staleItem = imageItems.Where(item =>
@@ -302,7 +314,5 @@ namespace Observatory.Photographer
             }
             return false;
         }
-
-        public void UpdateContext(Status status) { }
     }
 }

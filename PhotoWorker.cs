@@ -70,11 +70,6 @@ namespace Observatory.Photographer
             }
         }
 
-        void IObservatoryWorker.StatusChange(Observatory.Framework.Files.Status status)
-        {
-            _photographer?.UpdateContext(status);
-        }
-
         void IObservatoryPlugin.Load(IObservatoryCore observatoryCore)
         {
             _photographer = new(observatoryCore, this, _mainPanel, _settings, observatoryCore.GetPluginErrorLogger(this));
@@ -102,6 +97,12 @@ namespace Observatory.Photographer
             {
                 _settings.ProcessDuringReadAll = false;
                 _mainPanel.Core?.SaveSettings(this);
+            }
+
+            if (eventArgs.NewState.HasFlag(LogMonitorState.Batch)
+                && !eventArgs.NewState.HasFlag(LogMonitorState.PreRead))
+            {
+                _photographer?.Clear();
             }
         }
 

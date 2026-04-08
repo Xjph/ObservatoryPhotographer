@@ -70,23 +70,30 @@ namespace Observatory.Photographer
 
         private IEnumerable<PhotoAction> DeserializeActions(object[] actions) =>
             actions
-                .Select<object, PhotoAction>(action =>
+                .Select(action =>
                 {
                     try
                     {
                         var jsonAction = (JsonElement)action;
                         var actionType = (PhotoActionKind)
                             jsonAction.GetProperty("Action").GetInt32();
-                        return actionType switch
+                        PhotoAction? deserializedAction = actionType switch
                         {
-                            PhotoActionKind.Save => jsonAction.Deserialize<SaveAction>()!,
-                            PhotoActionKind.Resize => jsonAction.Deserialize<ResizeAction>()!,
-                            PhotoActionKind.Caption => jsonAction.Deserialize<CaptionAction>()!,
-                            PhotoActionKind.Watermark => jsonAction.Deserialize<WatermarkAction>()!,
+                            PhotoActionKind.Save => jsonAction.Deserialize<SaveAction>(),
+                            PhotoActionKind.Resize => jsonAction.Deserialize<ResizeAction>(),
+                            PhotoActionKind.Caption => jsonAction.Deserialize<CaptionAction>(),
+                            PhotoActionKind.Watermark => jsonAction.Deserialize<WatermarkAction>(),
                             _ => throw new InvalidOperationException(
                                 "Unknown action type in settings"
                             ),
                         };
+                        if (deserializedAction == null)
+                        {
+                            throw new InvalidOperationException(
+                                $"Deserialization returned null for action {actionType}."
+                            );
+                        }
+                        return deserializedAction;
                     }
                     catch (Exception ex)
                     {
@@ -94,8 +101,7 @@ namespace Observatory.Photographer
                         _errorLogger(ex, "Failed to deserialize photo action.");
                         return null!;
                     }
-                })
-                .Where(action => action != null)!;
+                });
 
         private T? DeserializeOrDefault<T>(string json)
         {
