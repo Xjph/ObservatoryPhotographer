@@ -1,5 +1,4 @@
-﻿using ImageMagick;
-using Observatory.Framework.Interfaces;
+﻿using Observatory.Framework.Interfaces;
 
 namespace Observatory.Photographer.UI
 {

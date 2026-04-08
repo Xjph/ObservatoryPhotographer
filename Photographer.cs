@@ -1,6 +1,5 @@
 ﻿using System.Collections.Concurrent;
 using System.Text;
-using System.Text.Json;
 using ImageMagick;
 using Observatory.Framework;
 using Observatory.Framework.Files;

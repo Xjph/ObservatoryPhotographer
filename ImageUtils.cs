@@ -1,8 +1,6 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 using System.Text.Json;
 using ImageMagick;
-using ImageMagick.Drawing;
 using Observatory.Framework.Files.ParameterTypes;
 
 namespace Observatory.Photographer
