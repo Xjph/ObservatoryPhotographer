@@ -1,7 +1,10 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using System.Text.Json;
 using ImageMagick;
 using Observatory.Framework.Files.ParameterTypes;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
+using static Observatory.Photographer.ImageUtils;
 
 namespace Observatory.Photographer
 {
@@ -462,9 +465,54 @@ namespace Observatory.Photographer
             return minIndex;
         }
 
+        private static void LocateAndComposite(
+            LocationMethod locationMethod,
+            Quad quad,
+            SecondOrderQuad secondOrderQuad,
+            Point location,
+            bool secondOrder,
+            MagickImage baseImage,
+            MagickImage overlayImage,
+            MagickImage compImage
+        )
+        {
+            int quadInt = 0;
+            if (locationMethod == LocationMethod.Automatic)
+            {
+                quadInt = FindOpenQuad(baseImage, secondOrder);
+            }
+            else if (locationMethod == LocationMethod.Quadrant)
+            {
+                quadInt = secondOrder ? (int)secondOrderQuad : (int)quad;
+            }
+
+            if (locationMethod == LocationMethod.Manual)
+            {
+                overlayImage.Composite(compImage, location.X, location.Y, CompositeOperator.Over);
+            }
+            else
+            {
+                if (secondOrder)
+                {
+                    var bounds = GetBoundsFromQuad(baseImage, quadInt, secondOrder);
+                    overlayImage.Composite(compImage, bounds.X, bounds.Y, CompositeOperator.Over);
+                }
+                else
+                {
+                    var gravity = quadInt switch
+                    {
+                        3 => Gravity.Southeast,
+                        2 => Gravity.Southwest,
+                        1 => Gravity.Northeast,
+                        _ => Gravity.Northwest,
+                    };
+                    overlayImage.Composite(compImage, gravity, CompositeOperator.Over);
+                }
+            }
+        }
+
         public static void AddTextToImage(CaptionAction action, ImageWithMetadata imageData)
         {
-            int quad = 0;
             var captionSettings = new MagickReadSettings()
             {
                 Font = action.Font.Name,
@@ -478,58 +526,21 @@ namespace Observatory.Photographer
                 captionSettings
             );
 
-            if (action.LocationMethod == LocationMethod.Automatic)
-            {
-                quad = FindOpenQuad(imageData.Image, action.SecondOrder);
-            }
-            else if (action.LocationMethod == LocationMethod.Quadrant)
-            {
-                quad = action.SecondOrder ? (int)action.SecondOrderQuad : (int)action.Quad;
-            }
-
-            if (action.LocationMethod == LocationMethod.Manual)
-            {
-                imageData.Overlay.Composite(caption, action.Location.X, action.Location.Y, CompositeOperator.Over);
-            }
-            else
-            {
-                if (action.SecondOrder)
-                {
-                    var bounds = GetBoundsFromQuad(imageData.Image, quad, action.SecondOrder);
-                    imageData.Overlay.Composite(caption, bounds.X, bounds.Y, CompositeOperator.Over);
-                }
-                else
-                {
-                    var gravity = quad switch
-                    {
-                        3 => Gravity.Southeast,
-                        2 => Gravity.Southwest,
-                        1 => Gravity.Northeast,
-                        _ => Gravity.Northwest,
-                    };
-                    imageData.Overlay.Composite(caption, gravity, CompositeOperator.Over);
-                }
-            }
-            
+            LocateAndComposite(
+                action.LocationMethod,
+                action.Quad,
+                action.SecondOrderQuad,
+                action.Location,
+                action.SecondOrder,
+                imageData.Image,
+                imageData.Overlay,
+                caption
+            );
         }
 
         public static void AddWatermarkToImage(WatermarkAction action, ImageWithMetadata imageData)
         {
-            int quad = 0;
-            if (action.LocationMethod == LocationMethod.Automatic)
-            {
-                quad = FindOpenQuad(imageData.Image, action.SecondOrder);
-            }
-            else if (action.LocationMethod == LocationMethod.Quadrant)
-            {
-                quad = action.SecondOrder ? (int)action.SecondOrderQuad : (int)action.Quad;
-            }
-
-            int x,
-                y;
-
             MagickImage watermark;
-
             try
             {
                 watermark = new(action.WatermarkImagePath);
@@ -537,36 +548,22 @@ namespace Observatory.Photographer
             catch (Exception ex)
             {
                 // Rethrow for higher level logging and to halt further processing.
-                throw new Exception($"Failed to load watermark image from path: {action.WatermarkImagePath}", ex);
+                throw new Exception(
+                    $"Failed to load watermark image from path: {action.WatermarkImagePath}",
+                    ex
+                );
             }
 
-            if (action.LocationMethod == LocationMethod.Manual)
-            {
-                x = action.Location.X;
-                y = action.Location.Y;
-                imageData.Overlay.Composite(watermark, x, y);
-            }
-            else
-            {
-                if (action.SecondOrder)
-                {
-                    var bounds = GetBoundsFromQuad(imageData.Image, quad, action.SecondOrder);
-                    x = bounds.X;
-                    y = bounds.Y;
-                    imageData.Overlay.Composite(watermark, x, y);
-                }
-                else
-                {
-                    var gravity = quad switch
-                    {
-                        3 => Gravity.Southeast,
-                        2 => Gravity.Southwest,
-                        1 => Gravity.Northeast,
-                        _ => Gravity.Northwest,
-                    };
-                    imageData.Overlay.Composite(watermark, gravity);
-                }
-            }
+            LocateAndComposite(
+                action.LocationMethod,
+                action.Quad,
+                action.SecondOrderQuad,
+                action.Location,
+                action.SecondOrder,
+                imageData.Image,
+                imageData.Overlay,
+                watermark
+            );
 
             watermark.Dispose();
         }

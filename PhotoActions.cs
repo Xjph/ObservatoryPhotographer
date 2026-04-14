@@ -8,7 +8,7 @@ namespace Observatory.Photographer
         Save,
         Resize,
         Caption,
-        Watermark
+        Watermark,
     }
 
     public enum LocationMethod
@@ -26,7 +26,6 @@ namespace Observatory.Photographer
     public abstract class PhotoAction
     {
         public abstract PhotoActionKind Action { get; }
-        // public required ImageWithMetadata Metadata { get; set; }
     }
 
     public class SaveAction : PhotoAction

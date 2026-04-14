@@ -87,92 +87,104 @@ namespace Observatory.Photographer
                 if (file != null)
                     _processingTasks.Add(
                         Task.Run(() =>
-                        {
-                            var largeImageKeys =
-                                _ui.PhotoListView.LargeImageList?.Images.Keys.Cast<string>()
-                                    .ToList()
-                                ?? [];
-                            List<ListViewItem> imageItems = [];
-                            UiExec(() =>
-                                imageItems = [.. _ui.PhotoListView.Items.Cast<ListViewItem>()]
-                            );
-
-                            MagickImage original = new(file.FullName);
-                            if (largeImageKeys.Contains(file.FullName))
                             {
-                                var staleItem = imageItems.Where(item =>
-                                    item.ImageKey == file.FullName
-                                );
-                                if (staleItem.Any())
-                                {
-                                    UiExec(() => _ui.PhotoListView.Items.Remove(staleItem.First()));
-                                }
-                            }
-                            else
-                            {
-                                var aspect = original.Width / (double)original.Height;
-                                int thumbWidth = 256;
-                                int thumbHeight = (int)Math.Floor(256 / aspect);
-                                var resized = MagickToBitmap(original, thumbWidth, thumbHeight);
+                                var largeImageKeys =
+                                    _ui.PhotoListView.LargeImageList?.Images.Keys.Cast<string>()
+                                        .ToList()
+                                    ?? [];
+                                List<ListViewItem> imageItems = [];
                                 UiExec(() =>
-                                {
-                                    _ui.PhotoListView.LargeImageList!.ImageSize = new Size(
-                                        thumbWidth,
-                                        thumbHeight
-                                    );
-                                    _ui.PhotoListView.LargeImageList!.Images.Add(
-                                        file.FullName,
-                                        resized
-                                    );
-                                });
-                            }
-
-                            string itemLabel;
-
-                            if (!string.IsNullOrEmpty(screenshot.System))
-                                itemLabel = screenshot.System;
-                            else
-                                itemLabel = screenshot.Timestamp;
-
-                            Status? status = null;
-                            var isRealtime = StatusIsCurrent(_core.CurrentLogMonitorState);
-
-                            if (isRealtime)
-                            {
-                                status = _core.GetStatus();
-                                if (status != null)
-                                {
-                                    _photoData.ScreenshotStatus[file.FullName] = status;
-                                    _photoData.SaveStatus();
-                                }
-                            }
-                            else
-                            {
-                                _photoData.ScreenshotStatus.TryGetValue(file.FullName, out status);
-                            }
-
-                            UiExec(() =>
-                                _ui.PhotoListView.Items.Add(
-                                    new ListViewItem(screenshot.System) { ImageKey = file.FullName }
-                                )
-                            );
-                            _imageData[file.FullName] = new(original, screenshot, status);
-
-                            if (ProceedWithProcessing(_core.CurrentLogMonitorState))
-                            {
-                                ImageUtils.PerformPhotoActions(
-                                    GetDefaultActions(),
-                                    _imageData[file.FullName]
+                                    imageItems = [.. _ui.PhotoListView.Items.Cast<ListViewItem>()]
                                 );
-                            }
-                        }).ContinueWith(t =>
-                        {
-                            if (t.Exception != null)
+
+                                MagickImage original = new(file.FullName);
+                                if (largeImageKeys.Contains(file.FullName))
+                                {
+                                    var staleItem = imageItems.Where(item =>
+                                        item.ImageKey == file.FullName
+                                    );
+                                    if (staleItem.Any())
+                                    {
+                                        UiExec(() =>
+                                            _ui.PhotoListView.Items.Remove(staleItem.First())
+                                        );
+                                    }
+                                }
+                                else
+                                {
+                                    var aspect = original.Width / (double)original.Height;
+                                    int thumbWidth = 256;
+                                    int thumbHeight = (int)Math.Floor(256 / aspect);
+                                    var resized = MagickToBitmap(original, thumbWidth, thumbHeight);
+                                    UiExec(() =>
+                                    {
+                                        _ui.PhotoListView.LargeImageList!.ImageSize = new Size(
+                                            thumbWidth,
+                                            thumbHeight
+                                        );
+                                        _ui.PhotoListView.LargeImageList!.Images.Add(
+                                            file.FullName,
+                                            resized
+                                        );
+                                    });
+                                }
+
+                                string itemLabel;
+
+                                if (!string.IsNullOrEmpty(screenshot.System))
+                                    itemLabel = screenshot.System;
+                                else
+                                    itemLabel = screenshot.Timestamp;
+
+                                Status? status = null;
+                                var isRealtime = StatusIsCurrent(_core.CurrentLogMonitorState);
+
+                                if (isRealtime)
+                                {
+                                    status = _core.GetStatus();
+                                    if (status != null)
+                                    {
+                                        _photoData.ScreenshotStatus[file.FullName] = status;
+                                        _photoData.SaveStatus();
+                                    }
+                                }
+                                else
+                                {
+                                    _photoData.ScreenshotStatus.TryGetValue(
+                                        file.FullName,
+                                        out status
+                                    );
+                                }
+
+                                UiExec(() =>
+                                    _ui.PhotoListView.Items.Add(
+                                        new ListViewItem(screenshot.System)
+                                        {
+                                            ImageKey = file.FullName,
+                                        }
+                                    )
+                                );
+                                _imageData[file.FullName] = new(original, screenshot, status);
+
+                                if (ProceedWithProcessing(_core.CurrentLogMonitorState))
+                                {
+                                    ImageUtils.PerformPhotoActions(
+                                        GetDefaultActions(),
+                                        _imageData[file.FullName]
+                                    );
+                                }
+                            })
+                            .ContinueWith(t =>
                             {
-                                Errorlogger(t.Exception, $"Error processing screenshot {file.FullName}");
-                            }
-                            TaskCleanup();
-                        })
+                                if (t.Exception != null)
+                                {
+                                    Errorlogger(
+                                        t.Exception,
+                                        $"Error processing screenshot {file.FullName}"
+                                    );
+                                }
+                                TaskCleanup();
+                            })
                     );
             }
         }
@@ -289,13 +301,16 @@ namespace Observatory.Photographer
 
         private FileInfo? FindImage(Screenshot screenshot)
         {
-            var filename = screenshot.Filename
-                .Replace("\\ED_Pictures", string.Empty);
+            var filename = screenshot.Filename.Replace("\\ED_Pictures", string.Empty);
 
             if (CheckAndSetPath(ref filename))
             {
-                if (!_settings.AllowTimestampMismatch && 
-                    Math.Abs((screenshot.TimestampDateTime - File.GetCreationTimeUtc(filename)).TotalDays) > 1)
+                if (
+                    !_settings.AllowTimestampMismatch
+                    && Math.Abs(
+                        (screenshot.TimestampDateTime - File.GetCreationTimeUtc(filename)).TotalDays
+                    ) > 1
+                )
                     return null;
                 return new FileInfo(filename);
             }

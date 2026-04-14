@@ -16,11 +16,13 @@ namespace Observatory.Photographer
             var defaultScreenshotLocation = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.MyPictures),
                 "Frontier Developments",
-                "Elite Dangerous");
+                "Elite Dangerous"
+            );
 
             var defaultOutputLocation = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.MyPictures),
-                "Elite Observatory Screenshots");
+                "Elite Observatory Screenshots"
+            );
 
             _settings = new()
             {
@@ -72,7 +74,13 @@ namespace Observatory.Photographer
 
         void IObservatoryPlugin.Load(IObservatoryCore observatoryCore)
         {
-            _photographer = new(observatoryCore, this, _mainPanel, _settings, observatoryCore.GetPluginErrorLogger(this));
+            _photographer = new(
+                observatoryCore,
+                this,
+                _mainPanel,
+                _settings,
+                observatoryCore.GetPluginErrorLogger(this)
+            );
             _mainPanel.Core = observatoryCore;
             _mainPanel.Worker = this;
             _mainPanel.Photographer = _photographer;
@@ -99,8 +107,10 @@ namespace Observatory.Photographer
                 _mainPanel.Core?.SaveSettings(this);
             }
 
-            if (eventArgs.NewState.HasFlag(LogMonitorState.Batch)
-                && !eventArgs.NewState.HasFlag(LogMonitorState.PreRead))
+            if (
+                eventArgs.NewState.HasFlag(LogMonitorState.Batch)
+                && !eventArgs.NewState.HasFlag(LogMonitorState.PreRead)
+            )
             {
                 _photographer?.Clear();
             }

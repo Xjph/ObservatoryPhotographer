@@ -48,10 +48,7 @@ namespace Observatory.Photographer.UI
             CancelButton = CancelBtn;
             InitializeComponent();
             RestoreSavedProcess();
-            FilenameTooltip.SetToolTip(
-                ExampleLabel,
-                string.Empty
-            );
+            FilenameTooltip.SetToolTip(ExampleLabel, string.Empty);
         }
 
         private void UpdateUIFromActionList(IEnumerable<PhotoAction> actionList)
@@ -140,7 +137,7 @@ namespace Observatory.Photographer.UI
                 );
                 actionList = defaultActions ?? [];
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 _mainPanel?.Photographer?.Errorlogger(ex, "Failed to restore saved process.");
                 actionList = [];
@@ -165,16 +162,20 @@ namespace Observatory.Photographer.UI
             ProcessingLabel.Enabled = true;
             ProcessingLabel.Visible = true;
             Task.Run(() =>
-            {
-                ImageUtils.PerformPhotoActions(BuildActionList(), _image);
-                _core?.ExecuteOnUIThread(() => Close());
-            }).ContinueWith(t =>
-            {
-                if (t.Exception != null)
                 {
-                    _mainPanel?.Photographer?.Errorlogger(t.Exception, "Error performing photo actions.");
-                }
-            });
+                    ImageUtils.PerformPhotoActions(BuildActionList(), _image);
+                    _core?.ExecuteOnUIThread(() => Close());
+                })
+                .ContinueWith(t =>
+                {
+                    if (t.Exception != null)
+                    {
+                        _mainPanel?.Photographer?.Errorlogger(
+                            t.Exception,
+                            "Error performing photo actions."
+                        );
+                    }
+                });
         }
 
         private void SetDefaultButton_Click(object sender, EventArgs e)
@@ -304,10 +305,7 @@ namespace Observatory.Photographer.UI
                 _image,
                 _saveAction.CmdrName
             );
-            FilenameTooltip.SetToolTip(
-                ExampleLabel,
-                ExampleLabel.Text
-            );
+            FilenameTooltip.SetToolTip(ExampleLabel, ExampleLabel.Text);
         }
 
         private void FilenameLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
