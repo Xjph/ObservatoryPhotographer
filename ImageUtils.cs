@@ -121,195 +121,173 @@ namespace Observatory.Photographer
             }
         }
 
-        public static string FillTokenizedString(
-            string tokenizedString,
-            ImageWithMetadata metadata,
-            string cmdrName = ""
-        )
+        private static string resolveFlag(Framework.Files.Status? status, StatusFlags flag)
         {
-            string resolveFlag(Framework.Files.Status? status, StatusFlags flag)
+            if (status is null)
+                return string.Empty;
+            return flag switch
             {
-                if (status is null)
-                    return string.Empty;
-                return flag switch
-                {
-                    StatusFlags.Docked => status.Flags.HasFlag(StatusFlags.Docked)
-                        ? "Docked"
-                        : "Undocked",
-                    StatusFlags.Landed => status.Flags.HasFlag(StatusFlags.Landed)
-                        ? "Landed"
-                        : "In Flight",
-                    StatusFlags.LandingGear => status.Flags.HasFlag(StatusFlags.LandingGear)
-                        ? "Down"
-                        : "Raised",
-                    StatusFlags.Shields => status.Flags.HasFlag(StatusFlags.Shields)
-                        ? "Up"
-                        : "Down",
-                    StatusFlags.Supercruise => status.Flags.HasFlag(StatusFlags.Supercruise)
-                        ? "Supercruise"
-                        : "Normal Space",
-                    StatusFlags.FAOff => status.Flags.HasFlag(StatusFlags.FAOff) ? "Off" : "On",
-                    StatusFlags.Hardpoints => status.Flags.HasFlag(StatusFlags.Hardpoints)
-                        ? "Deployed"
-                        : "Retracted",
-                    StatusFlags.Wing => status.Flags.HasFlag(StatusFlags.Wing) ? "Wing" : "Solo",
-                    StatusFlags.Lights => status.Flags.HasFlag(StatusFlags.Lights) ? "On" : "Off",
-                    StatusFlags.CargoScoop => status.Flags.HasFlag(StatusFlags.CargoScoop)
-                        ? "Deployed"
-                        : "Retracted",
-                    StatusFlags.SilentRunning => status.Flags.HasFlag(StatusFlags.SilentRunning)
-                        ? "Silent Running"
-                        : "",
-                    StatusFlags.FuelScooping => status.Flags.HasFlag(StatusFlags.FuelScooping)
-                        ? "Scooping"
-                        : "",
-                    StatusFlags.SRVBrake => status.Flags.HasFlag(StatusFlags.SRVBrake)
-                        ? "On"
-                        : "Off",
-                    StatusFlags.SRVTurret => status.Flags.HasFlag(StatusFlags.SRVTurret)
-                        ? "Active"
-                        : "Fixed",
-                    StatusFlags.SRVProximity => status.Flags.HasFlag(StatusFlags.SRVProximity)
-                        ? "Close"
-                        : "Clear",
-                    StatusFlags.SRVDriveAssist => status.Flags.HasFlag(StatusFlags.SRVDriveAssist)
-                        ? "On"
-                        : "Off",
-                    StatusFlags.Masslock => status.Flags.HasFlag(StatusFlags.Masslock)
-                        ? "Mass Locked"
-                        : "",
-                    StatusFlags.FSDCharging => status.Flags.HasFlag(StatusFlags.FSDCharging)
-                        ? "FSD Charging"
-                        : "FSD Idle",
-                    StatusFlags.FSDCooldown => status.Flags.HasFlag(StatusFlags.FSDCooldown)
-                        ? "FSD Cooldown"
-                        : "FSD Ready",
-                    StatusFlags.LowFuel => status.Flags.HasFlag(StatusFlags.LowFuel)
-                        ? "Low Fuel"
-                        : "Fuel OK",
-                    StatusFlags.Overheat => status.Flags.HasFlag(StatusFlags.Overheat)
-                        ? "Overheating"
-                        : "Temperature Normal",
-                    StatusFlags.LatLongValid => status.Flags.HasFlag(StatusFlags.LatLongValid)
-                        ? "Lat/Long Valid"
-                        : "Lat/Long Invalid",
-                    StatusFlags.InDanger => status.Flags.HasFlag(StatusFlags.InDanger)
-                        ? "In Danger"
-                        : "",
-                    StatusFlags.Interdiction => status.Flags.HasFlag(StatusFlags.Interdiction)
-                        ? "Interdicted"
-                        : "",
-                    StatusFlags.MainShip => status.Flags.HasFlag(StatusFlags.MainShip)
-                        ? "Ship"
-                        : "",
-                    StatusFlags.Fighter => status.Flags.HasFlag(StatusFlags.Fighter)
-                        ? "Fighter"
-                        : "",
-                    StatusFlags.SRV => status.Flags.HasFlag(StatusFlags.SRV) ? "SRV" : "",
-                    StatusFlags.AnalysisHUD => status.Flags.HasFlag(StatusFlags.AnalysisHUD)
-                        ? "Analysis"
-                        : "Combat",
-                    StatusFlags.NightVision => status.Flags.HasFlag(StatusFlags.NightVision)
-                        ? "On"
-                        : "Off",
-                    StatusFlags.RadialAltitude => status.Flags.HasFlag(StatusFlags.RadialAltitude)
-                        ? "Radial"
-                        : "Terrain",
-                    StatusFlags.FSDJump => status.Flags.HasFlag(StatusFlags.FSDJump)
-                        ? "FSD Jumping"
-                        : "",
-                    StatusFlags.SRVHighBeam => status.Flags.HasFlag(StatusFlags.SRVHighBeam)
-                        ? "On"
-                        : "Off",
-                    _ => string.Empty,
-                };
-            }
+                StatusFlags.Docked => status.Flags.HasFlag(StatusFlags.Docked)
+                    ? "Docked"
+                    : "Undocked",
+                StatusFlags.Landed => status.Flags.HasFlag(StatusFlags.Landed)
+                    ? "Landed"
+                    : "In Flight",
+                StatusFlags.LandingGear => status.Flags.HasFlag(StatusFlags.LandingGear)
+                    ? "Down"
+                    : "Raised",
+                StatusFlags.Shields => status.Flags.HasFlag(StatusFlags.Shields) ? "Up" : "Down",
+                StatusFlags.Supercruise => status.Flags.HasFlag(StatusFlags.Supercruise)
+                    ? "Supercruise"
+                    : "Normal Space",
+                StatusFlags.FAOff => status.Flags.HasFlag(StatusFlags.FAOff) ? "Off" : "On",
+                StatusFlags.Hardpoints => status.Flags.HasFlag(StatusFlags.Hardpoints)
+                    ? "Deployed"
+                    : "Retracted",
+                StatusFlags.Wing => status.Flags.HasFlag(StatusFlags.Wing) ? "Wing" : "Solo",
+                StatusFlags.Lights => status.Flags.HasFlag(StatusFlags.Lights) ? "On" : "Off",
+                StatusFlags.CargoScoop => status.Flags.HasFlag(StatusFlags.CargoScoop)
+                    ? "Deployed"
+                    : "Retracted",
+                StatusFlags.SilentRunning => status.Flags.HasFlag(StatusFlags.SilentRunning)
+                    ? "Silent Running"
+                    : "",
+                StatusFlags.FuelScooping => status.Flags.HasFlag(StatusFlags.FuelScooping)
+                    ? "Scooping"
+                    : "",
+                StatusFlags.SRVBrake => status.Flags.HasFlag(StatusFlags.SRVBrake) ? "On" : "Off",
+                StatusFlags.SRVTurret => status.Flags.HasFlag(StatusFlags.SRVTurret)
+                    ? "Active"
+                    : "Fixed",
+                StatusFlags.SRVProximity => status.Flags.HasFlag(StatusFlags.SRVProximity)
+                    ? "Close"
+                    : "Clear",
+                StatusFlags.SRVDriveAssist => status.Flags.HasFlag(StatusFlags.SRVDriveAssist)
+                    ? "On"
+                    : "Off",
+                StatusFlags.Masslock => status.Flags.HasFlag(StatusFlags.Masslock)
+                    ? "Mass Locked"
+                    : "",
+                StatusFlags.FSDCharging => status.Flags.HasFlag(StatusFlags.FSDCharging)
+                    ? "FSD Charging"
+                    : "FSD Idle",
+                StatusFlags.FSDCooldown => status.Flags.HasFlag(StatusFlags.FSDCooldown)
+                    ? "FSD Cooldown"
+                    : "FSD Ready",
+                StatusFlags.LowFuel => status.Flags.HasFlag(StatusFlags.LowFuel)
+                    ? "Low Fuel"
+                    : "Fuel OK",
+                StatusFlags.Overheat => status.Flags.HasFlag(StatusFlags.Overheat)
+                    ? "Overheating"
+                    : "Temperature Normal",
+                StatusFlags.LatLongValid => status.Flags.HasFlag(StatusFlags.LatLongValid)
+                    ? "Lat/Long Valid"
+                    : "Lat/Long Invalid",
+                StatusFlags.InDanger => status.Flags.HasFlag(StatusFlags.InDanger)
+                    ? "In Danger"
+                    : "",
+                StatusFlags.Interdiction => status.Flags.HasFlag(StatusFlags.Interdiction)
+                    ? "Interdicted"
+                    : "",
+                StatusFlags.MainShip => status.Flags.HasFlag(StatusFlags.MainShip) ? "Ship" : "",
+                StatusFlags.Fighter => status.Flags.HasFlag(StatusFlags.Fighter) ? "Fighter" : "",
+                StatusFlags.SRV => status.Flags.HasFlag(StatusFlags.SRV) ? "SRV" : "",
+                StatusFlags.AnalysisHUD => status.Flags.HasFlag(StatusFlags.AnalysisHUD)
+                    ? "Analysis"
+                    : "Combat",
+                StatusFlags.NightVision => status.Flags.HasFlag(StatusFlags.NightVision)
+                    ? "On"
+                    : "Off",
+                StatusFlags.RadialAltitude => status.Flags.HasFlag(StatusFlags.RadialAltitude)
+                    ? "Radial"
+                    : "Terrain",
+                StatusFlags.FSDJump => status.Flags.HasFlag(StatusFlags.FSDJump)
+                    ? "FSD Jumping"
+                    : "",
+                StatusFlags.SRVHighBeam => status.Flags.HasFlag(StatusFlags.SRVHighBeam)
+                    ? "On"
+                    : "Off",
+                _ => string.Empty,
+            };
+        }
 
-            string resolveFlag2(Framework.Files.Status? status, StatusFlags2 flag)
+        private static string resolveFlag2(Framework.Files.Status? status, StatusFlags2 flag)
+        {
+            if (status is null)
+                return string.Empty;
+            return flag switch
             {
-                if (status is null)
-                    return string.Empty;
-                return flag switch
-                {
-                    StatusFlags2.OnFoot => status.Flags2.HasFlag(StatusFlags2.OnFoot)
-                        ? "On Foot"
-                        : "",
-                    StatusFlags2.InTaxi => status.Flags2.HasFlag(StatusFlags2.InTaxi)
-                        ? "In Taxi"
-                        : "",
-                    StatusFlags2.InMulticrew => status.Flags2.HasFlag(StatusFlags2.InMulticrew)
-                        ? "In Multicrew"
-                        : "",
-                    StatusFlags2.OnFootInStation => status.Flags2.HasFlag(
-                        StatusFlags2.OnFootInStation
-                    )
-                        ? "In Station"
-                        : "",
-                    StatusFlags2.OnFootOnPlanet => status.Flags2.HasFlag(
-                        StatusFlags2.OnFootOnPlanet
-                    )
-                        ? "On Planet"
-                        : "",
-                    StatusFlags2.AimDownSight => status.Flags2.HasFlag(StatusFlags2.AimDownSight)
-                        ? "Aiming Down Sight"
-                        : "",
-                    StatusFlags2.LowOxygen => status.Flags2.HasFlag(StatusFlags2.LowOxygen)
-                        ? "Low Oxygen"
-                        : "",
-                    StatusFlags2.LowHealth => status.Flags2.HasFlag(StatusFlags2.LowHealth)
-                        ? "Low Health"
-                        : "",
-                    StatusFlags2.Cold => status.Flags2.HasFlag(StatusFlags2.Cold) ? "Cold" : "",
-                    StatusFlags2.Hot => status.Flags2.HasFlag(StatusFlags2.Hot) ? "Hot" : "",
-                    StatusFlags2.VeryCold => status.Flags2.HasFlag(StatusFlags2.VeryCold)
-                        ? "Very Cold"
-                        : "",
-                    StatusFlags2.VeryHot => status.Flags2.HasFlag(StatusFlags2.VeryHot)
-                        ? "Very Hot"
-                        : "",
-                    StatusFlags2.GlideMode => status.Flags2.HasFlag(StatusFlags2.GlideMode)
-                        ? "Gliding"
-                        : "",
-                    StatusFlags2.OnFootInHangar => status.Flags2.HasFlag(
-                        StatusFlags2.OnFootInHangar
-                    )
-                        ? "In Hangar"
-                        : "",
-                    StatusFlags2.OnFootInSocialSpace => status.Flags2.HasFlag(
-                        StatusFlags2.OnFootInSocialSpace
-                    )
-                        ? "In Social Space"
-                        : "",
-                    StatusFlags2.OnFootExterior => status.Flags2.HasFlag(
-                        StatusFlags2.OnFootExterior
-                    )
-                        ? "Exterior"
-                        : "",
-                    StatusFlags2.BreathableAtmosphere => status.Flags2.HasFlag(
-                        StatusFlags2.BreathableAtmosphere
-                    )
-                        ? "Breathable Atmosphere"
-                        : "",
-                    StatusFlags2.TelepresenceMulticrew => status.Flags2.HasFlag(
-                        StatusFlags2.TelepresenceMulticrew
-                    )
-                        ? "Telepresence"
-                        : "",
-                    StatusFlags2.PhysicalMulticrew => status.Flags2.HasFlag(
-                        StatusFlags2.PhysicalMulticrew
-                    )
-                        ? "Physical Multicrew"
-                        : "",
-                    StatusFlags2.FsdHyperdriveCharging => status.Flags2.HasFlag(
-                        StatusFlags2.FsdHyperdriveCharging
-                    )
-                        ? "FSD Charging"
-                        : "",
-                    _ => string.Empty,
-                };
-            }
+                StatusFlags2.OnFoot => status.Flags2.HasFlag(StatusFlags2.OnFoot) ? "On Foot" : "",
+                StatusFlags2.InTaxi => status.Flags2.HasFlag(StatusFlags2.InTaxi) ? "In Taxi" : "",
+                StatusFlags2.InMulticrew => status.Flags2.HasFlag(StatusFlags2.InMulticrew)
+                    ? "In Multicrew"
+                    : "",
+                StatusFlags2.OnFootInStation => status.Flags2.HasFlag(StatusFlags2.OnFootInStation)
+                    ? "In Station"
+                    : "",
+                StatusFlags2.OnFootOnPlanet => status.Flags2.HasFlag(StatusFlags2.OnFootOnPlanet)
+                    ? "On Planet"
+                    : "",
+                StatusFlags2.AimDownSight => status.Flags2.HasFlag(StatusFlags2.AimDownSight)
+                    ? "Aiming Down Sight"
+                    : "",
+                StatusFlags2.LowOxygen => status.Flags2.HasFlag(StatusFlags2.LowOxygen)
+                    ? "Low Oxygen"
+                    : "",
+                StatusFlags2.LowHealth => status.Flags2.HasFlag(StatusFlags2.LowHealth)
+                    ? "Low Health"
+                    : "",
+                StatusFlags2.Cold => status.Flags2.HasFlag(StatusFlags2.Cold) ? "Cold" : "",
+                StatusFlags2.Hot => status.Flags2.HasFlag(StatusFlags2.Hot) ? "Hot" : "",
+                StatusFlags2.VeryCold => status.Flags2.HasFlag(StatusFlags2.VeryCold)
+                    ? "Very Cold"
+                    : "",
+                StatusFlags2.VeryHot => status.Flags2.HasFlag(StatusFlags2.VeryHot)
+                    ? "Very Hot"
+                    : "",
+                StatusFlags2.GlideMode => status.Flags2.HasFlag(StatusFlags2.GlideMode)
+                    ? "Gliding"
+                    : "",
+                StatusFlags2.OnFootInHangar => status.Flags2.HasFlag(StatusFlags2.OnFootInHangar)
+                    ? "In Hangar"
+                    : "",
+                StatusFlags2.OnFootInSocialSpace => status.Flags2.HasFlag(
+                    StatusFlags2.OnFootInSocialSpace
+                )
+                    ? "In Social Space"
+                    : "",
+                StatusFlags2.OnFootExterior => status.Flags2.HasFlag(StatusFlags2.OnFootExterior)
+                    ? "Exterior"
+                    : "",
+                StatusFlags2.BreathableAtmosphere => status.Flags2.HasFlag(
+                    StatusFlags2.BreathableAtmosphere
+                )
+                    ? "Breathable Atmosphere"
+                    : "",
+                StatusFlags2.TelepresenceMulticrew => status.Flags2.HasFlag(
+                    StatusFlags2.TelepresenceMulticrew
+                )
+                    ? "Telepresence"
+                    : "",
+                StatusFlags2.PhysicalMulticrew => status.Flags2.HasFlag(
+                    StatusFlags2.PhysicalMulticrew
+                )
+                    ? "Physical Multicrew"
+                    : "",
+                StatusFlags2.FsdHyperdriveCharging => status.Flags2.HasFlag(
+                    StatusFlags2.FsdHyperdriveCharging
+                )
+                    ? "FSD Charging"
+                    : "",
+                _ => string.Empty,
+            };
+        }
 
-            Dictionary<string, string> tokenLookup = new(StringComparer.InvariantCultureIgnoreCase)
+        private static Dictionary<string, string> lookupDict(
+            string cmdrName,
+            ImageWithMetadata metadata
+        ) =>
+            new(StringComparer.InvariantCultureIgnoreCase)
             {
                 { "cmdr", cmdrName ?? string.Empty },
                 // Screenshot properties
@@ -417,12 +395,18 @@ namespace Observatory.Photographer
                 },
             };
 
-            foreach (var kvp in tokenLookup)
+        public static string FillTokenizedString(
+            string tokenizedString,
+            ImageWithMetadata metadata,
+            string cmdrName = ""
+        )
+        {
+            foreach (var kvp in lookupDict(cmdrName, metadata))
             {
                 tokenizedString = tokenizedString.Replace("{" + kvp.Key + "}", kvp.Value);
             }
 
-            // Finally check for timestamp tokens in format {timestamp:FORMAT}
+            // Check for timestamp tokens in format {timestamp:FORMAT}
             var timestampTokenStart = tokenizedString.IndexOf("{timestamp:");
             while (timestampTokenStart != -1)
             {
