@@ -6,19 +6,16 @@
 
         public WatermarkForm(WatermarkAction watermarkAction)
         {
-            bool proceed = true;
-            foreach (Form form in Application.OpenForms)
+            var openForm = Application.OpenForms.OfType<WatermarkForm>();
+            WatermarkAction = watermarkAction;
+            if (openForm.Any())
             {
-                if (form is WatermarkForm)
-                {
-                    form.Activate();
-                    Close();
-                    proceed = false;
-                }
+                openForm.First().Activate();
+                Close();
+                return;
             }
-            if (proceed)
+            else
             {
-                WatermarkAction = watermarkAction;
                 InitializeComponent();
 
                 // Override theme

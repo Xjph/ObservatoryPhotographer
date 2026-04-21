@@ -6,18 +6,15 @@
 
         public CaptionForm(CaptionAction captionAction)
         {
-            bool proceed = true;
+            var openForm = Application.OpenForms.OfType<CaptionForm>();
             CaptionAction = captionAction;
-            foreach (Form form in Application.OpenForms)
+            if (openForm.Any())
             {
-                if (form is CaptionForm)
-                {
-                    form.Activate();
-                    Close();
-                    proceed = false;
-                }
+                openForm.First().Activate();
+                Close();
+                return;
             }
-            if (proceed)
+            else
             {
                 InitializeComponent();
                 PopulateQuads();

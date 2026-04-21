@@ -119,6 +119,7 @@
             LocationRelativeCheckbox.TabIndex = 11;
             LocationRelativeCheckbox.Text = "Relative";
             LocationRelativeCheckbox.UseVisualStyleBackColor = true;
+            LocationRelativeCheckbox.CheckedChanged += LocationRelativeCheckbox_CheckedChanged;
             // 
             // LocationYLabel
             // 
@@ -134,7 +135,7 @@
             LocationXLabel.AutoSize = true;
             LocationXLabel.Location = new Point(98, 178);
             LocationXLabel.Name = "LocationXLabel";
-            LocationXLabel.Size = new Size(13, 15);
+            LocationXLabel.Size = new Size(12, 15);
             LocationXLabel.TabIndex = 9;
             LocationXLabel.Text = "x";
             // 
@@ -144,6 +145,7 @@
             LocationYSpinner.Name = "LocationYSpinner";
             LocationYSpinner.Size = new Size(67, 23);
             LocationYSpinner.TabIndex = 8;
+            LocationYSpinner.ValueChanged += LocationYSpinner_ValueChanged;
             // 
             // LocationXSpinner
             // 
@@ -151,6 +153,7 @@
             LocationXSpinner.Name = "LocationXSpinner";
             LocationXSpinner.Size = new Size(67, 23);
             LocationXSpinner.TabIndex = 7;
+            LocationXSpinner.ValueChanged += LocationXSpinner_ValueChanged;
             // 
             // LocationSpecificRadio
             // 
@@ -162,6 +165,7 @@
             LocationSpecificRadio.TabStop = true;
             LocationSpecificRadio.Text = "Manual Location";
             LocationSpecificRadio.UseVisualStyleBackColor = true;
+            LocationSpecificRadio.CheckedChanged += LocationRadioChanged;
             // 
             // QuadOrderCheckbox
             // 
@@ -172,6 +176,7 @@
             QuadOrderCheckbox.TabIndex = 5;
             QuadOrderCheckbox.Text = "Second Order";
             QuadOrderCheckbox.UseVisualStyleBackColor = true;
+            QuadOrderCheckbox.CheckedChanged += QuadOrderCheckbox_CheckedChanged;
             // 
             // LocationQuadDropdown
             // 
@@ -181,27 +186,30 @@
             LocationQuadDropdown.Name = "LocationQuadDropdown";
             LocationQuadDropdown.Size = new Size(205, 23);
             LocationQuadDropdown.TabIndex = 4;
+            LocationQuadDropdown.SelectedIndexChanged += LocationQuadDropdown_SelectedIndexChanged;
             // 
             // LocationQuadRadio
             // 
             LocationQuadRadio.AutoSize = true;
             LocationQuadRadio.Location = new Point(6, 72);
             LocationQuadRadio.Name = "LocationQuadRadio";
-            LocationQuadRadio.Size = new Size(106, 19);
+            LocationQuadRadio.Size = new Size(105, 19);
             LocationQuadRadio.TabIndex = 3;
             LocationQuadRadio.TabStop = true;
             LocationQuadRadio.Text = "Fixed Quadrant";
             LocationQuadRadio.UseVisualStyleBackColor = true;
+            LocationQuadRadio.CheckedChanged += LocationRadioChanged;
             // 
             // AutoOrderCheckbox
             // 
             AutoOrderCheckbox.AutoSize = true;
             AutoOrderCheckbox.Location = new Point(24, 47);
             AutoOrderCheckbox.Name = "AutoOrderCheckbox";
-            AutoOrderCheckbox.Size = new Size(73, 19);
+            AutoOrderCheckbox.Size = new Size(74, 19);
             AutoOrderCheckbox.TabIndex = 2;
             AutoOrderCheckbox.Text = "Two Pass";
             AutoOrderCheckbox.UseVisualStyleBackColor = true;
+            AutoOrderCheckbox.CheckedChanged += AutoOrderCheckbox_CheckedChanged;
             // 
             // AutomaticLocationRadio
             // 
@@ -213,6 +221,7 @@
             AutomaticLocationRadio.TabStop = true;
             AutomaticLocationRadio.Text = "Automatically Determine Open Space";
             AutomaticLocationRadio.UseVisualStyleBackColor = true;
+            AutomaticLocationRadio.CheckedChanged += LocationRadioChanged;
             // 
             // WatermarkForm
             // 
@@ -224,6 +233,7 @@
             Controls.Add(BrowseButton);
             Controls.Add(PathTextbox);
             Controls.Add(PathLabel);
+            FormBorderStyle = FormBorderStyle.FixedToolWindow;
             Name = "WatermarkForm";
             Text = "Watermark Setup";
             groupBox1.ResumeLayout(false);

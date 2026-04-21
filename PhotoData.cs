@@ -95,9 +95,9 @@ namespace Observatory.Photographer
                 {
                     // If deserialization fails for any reason, skip this action.
                     _errorLogger(ex, "Failed to deserialize photo action.");
-                    return null!;
+                    return null;
                 }
-            });
+            }).Where(action => action != null).Select(a => a!);
 
         private T? DeserializeOrDefault<T>(string json)
         {

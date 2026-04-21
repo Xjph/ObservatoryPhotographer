@@ -497,19 +497,24 @@ namespace Observatory.Photographer
 
         public static void AddTextToImage(CaptionAction action, ImageWithMetadata imageData)
         {
+            // Scale font based on image height to maintain
+            // uniformity of relative size across resolutions.
+            var fontScale = imageData.Image.Height / 480f;
+
             var captionSettings = new MagickReadSettings()
             {
                 Font = action.Font.Name,
                 TextGravity = Gravity.Northwest,
+                FillColor = action.Color,
                 BackgroundColor = MagickColors.Transparent,
-                FontPointsize = action.Font.SizeInPoints,
+                FontPointsize = action.Font.SizeInPoints * fontScale,
             };
 
             using var caption = new MagickImage(
                 $"caption:{FillTokenizedString(action.Text, imageData, action.CmdrName)}",
                 captionSettings
             );
-
+            System.Diagnostics.Debugger.Break();
             LocateAndComposite(
                 action.LocationMethod,
                 action.Quad,
@@ -537,7 +542,7 @@ namespace Observatory.Photographer
                     ex
                 );
             }
-
+            System.Diagnostics.Debugger.Break();
             LocateAndComposite(
                 action.LocationMethod,
                 action.Quad,
