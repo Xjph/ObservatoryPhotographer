@@ -499,7 +499,7 @@ namespace Observatory.Photographer
         {
             // Scale font based on image height to maintain
             // uniformity of relative size across resolutions.
-            var fontScale = imageData.Image.Height / 480f;
+            var fontScale = imageData.Image.Height / 720f;
 
             var captionSettings = new MagickReadSettings()
             {
