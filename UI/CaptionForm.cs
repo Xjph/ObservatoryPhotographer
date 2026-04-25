@@ -42,8 +42,14 @@
                     LocationSpecificRadio.Checked = true;
                     break;
             }
-            FontSampleLabel.Text = CaptionAction.Font.Name;
-            FontSampleLabel.Font = CaptionAction.Font;
+            FontSampleLabel.Font = new Font(CaptionAction.FontFamily, Font.Size);
+            FontSampleLabel.Text = FontSampleLabel.Font.Name;
+            FontSampleLabel.ForeColor = Color.FromArgb(
+                CaptionAction.Color.A,
+                CaptionAction.Color.R,
+                CaptionAction.Color.G,
+                CaptionAction.Color.B
+            );
         }
 
         private void PopulateQuads()
@@ -86,7 +92,9 @@
 
         private void FontButton_Click(object sender, EventArgs e)
         {
+            FontDialog.ShowEffects = false;
             var result = FontDialog.ShowDialog();
+
             if (result == DialogResult.OK)
             {
                 FontSampleLabel.Text = FontDialog.Font.Name;
@@ -95,7 +103,9 @@
                     FontSampleLabel.Font.Size,
                     FontDialog.Font.Style
                 );
-                CaptionAction.Font = FontDialog.Font;
+                CaptionAction.FontPath = ProcessForm.GetFontPath(FontDialog.Font);
+                CaptionAction.FontFamily = FontDialog.Font.FontFamily.Name;
+                CaptionAction.FontSize = (uint)FontDialog.Font.Size;
             }
         }
 

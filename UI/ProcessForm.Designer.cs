@@ -61,6 +61,7 @@
             SavePresetButton = new Button();
             FilenameTooltip = new ToolTip(components);
             SeparateCheckbox = new CheckBox();
+            CaptionLink = new LinkLabel();
             ResizePanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)ResizePercentSpinner).BeginInit();
             ((System.ComponentModel.ISupportInitialize)ResizeYSpinner).BeginInit();
@@ -411,11 +412,23 @@
             SeparateCheckbox.UseVisualStyleBackColor = true;
             SeparateCheckbox.CheckedChanged += SeparateCheckbox_CheckedChanged;
             // 
+            // CaptionLink
+            // 
+            CaptionLink.AutoSize = true;
+            CaptionLink.Location = new Point(290, 120);
+            CaptionLink.Name = "CaptionLink";
+            CaptionLink.Size = new Size(20, 15);
+            CaptionLink.TabIndex = 26;
+            CaptionLink.TabStop = true;
+            CaptionLink.Text = "(?)";
+            CaptionLink.LinkClicked += CaptionLink_LinkClicked;
+            // 
             // ProcessForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(324, 468);
+            Controls.Add(CaptionLink);
             Controls.Add(SeparateCheckbox);
             Controls.Add(SavePresetButton);
             Controls.Add(LoadPresetButton);
@@ -487,5 +500,6 @@
         private Button SavePresetButton;
         private ToolTip FilenameTooltip;
         private CheckBox SeparateCheckbox;
+        private LinkLabel CaptionLink;
     }
 }

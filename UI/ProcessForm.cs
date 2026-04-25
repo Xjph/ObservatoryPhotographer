@@ -1,4 +1,5 @@
-﻿using ImageMagick;
+﻿using System.Diagnostics;
+using ImageMagick;
 using Observatory.Framework.Interfaces;
 
 namespace Observatory.Photographer.UI
@@ -21,7 +22,13 @@ namespace Observatory.Photographer.UI
         public ProcessForm(ImageWithMetadata metadata, IObservatoryCore? core, PhotoWorker? worker)
         {
             _image = metadata;
-            _captionAction = new() { Font = Font, CmdrName = worker?.CmdrName ?? "CMDR" };
+            _captionAction = new()
+            {
+                FontPath = GetFontPath(Font),
+                FontFamily = Font.FontFamily.Name,
+                FontSize = (uint)Font.Size,
+                CmdrName = worker?.CmdrName ?? "CMDR",
+            };
             _watermarkAction = new() { WatermarkImagePath = string.Empty };
             _saveAction = new()
             {
@@ -38,16 +45,16 @@ namespace Observatory.Photographer.UI
                 Y = 100,
                 Relative = true,
             };
-            _captionForm = new(_captionAction);
-            _watermarkForm = new(_watermarkAction);
             _core = core;
             _worker = worker;
             _photoData = new(core, core.GetPluginErrorLogger(worker));
-            core?.RegisterControl(_captionForm);
-            core?.RegisterControl(_watermarkForm);
             CancelButton = CancelBtn;
             InitializeComponent();
             RestoreSavedProcess();
+            _captionForm = new(_captionAction);
+            _watermarkForm = new(_watermarkAction);
+            core?.RegisterControl(_captionForm);
+            core?.RegisterControl(_watermarkForm);
             FilenameTooltip.SetToolTip(ExampleLabel, string.Empty);
         }
 
@@ -99,6 +106,7 @@ namespace Observatory.Photographer.UI
                         break;
                     case CaptionAction captionAction:
                         _captionAction = captionAction;
+                        CaptionTextbox.Text = captionAction.Text;
                         CaptionCheckbox.Checked = true;
                         break;
                     case ResizeAction resizeAction:
@@ -161,6 +169,7 @@ namespace Observatory.Photographer.UI
             ProcessingLabel.BringToFront();
             ProcessingLabel.Enabled = true;
             ProcessingLabel.Visible = true;
+
             Task.Run(() =>
                 {
                     ImageUtils.PerformPhotoActions(BuildActionList(), _image);
@@ -308,89 +317,18 @@ namespace Observatory.Photographer.UI
             FilenameTooltip.SetToolTip(ExampleLabel, ExampleLabel.Text);
         }
 
+        private void CaptionLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            var referenceForm = new TokenReferenceForm(CaptionTextbox);
+            _core?.RegisterControl(referenceForm);
+            referenceForm.Show();
+        }
+
         private void FilenameLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            MessageBox.Show(
-                "SCREENSHOT PROPERTIES:\n"
-                    + "{cmdr} - Commander name\n"
-                    + "{latitude} - Latitude coordinate\n"
-                    + "{longitude} - Longitude coordinate\n"
-                    + "{system} - System name\n"
-                    + "{body} - Body name\n"
-                    + "{altitude} - Altitude\n"
-                    + "{heading} - Heading direction\n"
-                    + "{timestamp} - ISO timestamp (YYYY-MM-DDTHH-MM-SS)\n"
-                    + "{timestamp:FORMAT} - Custom formatted timestamp\n\n"
-                    + "STATUS PROPERTIES (Not always available):\n"
-                    + "{guifocus} - Current GUI focus\n"
-                    + "{balance} - Credit balance\n"
-                    + "{cargo} - Cargo amount\n"
-                    + "{mainfuel} - Main fuel level\n"
-                    + "{reservoirfuel} - Reservoir fuel level\n"
-                    + "{health} - Health percentage\n"
-                    + "{oxygen} - Oxygen percentage\n"
-                    + "{destination} - Destination name\n"
-                    + "{gravity-g} - Gravity in G\n"
-                    + "{gravity-mps2} - Gravity in m/s²\n"
-                    + "{legalstate} - Legal state\n"
-                    + "{radius} - Planet radius in km\n"
-                    + "{temperature} - Temperature\n"
-                    + "{hud} - HUD mode (Analysis/Combat)\n"
-                    + "{docked} - Docked/Undocked\n"
-                    + "{landed} - Landed/In Flight\n"
-                    + "{landinggear} - Landing gear (Down/Raised)\n"
-                    + "{shields} - Shields (Up/Down)\n"
-                    + "{supercruise} - Supercruise/Normal Space\n"
-                    + "{faoff} - Flight assist (On/Off)\n"
-                    + "{hardpoints} - Hardpoints (Deployed/Retracted)\n"
-                    + "{wing} - Wing/Solo\n"
-                    + "{lights} - Lights (On/Off)\n"
-                    + "{cargoscoop} - Cargo scoop (Deployed/Retracted)\n"
-                    + "{silentrunning} - Silent running status\n"
-                    + "{fuelscooping} - Fuel scooping status\n"
-                    + "{srvbrake} - SRV brake (On/Off)\n"
-                    + "{srvturret} - SRV turret (Active/Fixed)\n"
-                    + "{srvproximity} - SRV proximity (Close/Clear)\n"
-                    + "{srvdriveassist} - SRV drive assist (On/Off)\n"
-                    + "{masslock} - Mass lock status\n"
-                    + "{fsdcharging} - FSD charging/idle\n"
-                    + "{fsdcooldown} - FSD cooldown/ready\n"
-                    + "{lowfuel} - Low fuel warning\n"
-                    + "{overheat} - Overheat warning\n"
-                    + "{latlongvalid} - Lat/Long validity\n"
-                    + "{indanger} - In danger status\n"
-                    + "{interdiction} - Interdiction status\n"
-                    + "{mainship} - In main ship\n"
-                    + "{fighter} - In fighter\n"
-                    + "{srv} - In SRV\n"
-                    + "{nightvision} - Night vision (On/Off)\n"
-                    + "{radialaltitude} - Altitude mode (Radial/Terrain)\n"
-                    + "{fsdjump} - FSD jumping status\n"
-                    + "{srvhighbeam} - SRV high beam (On/Off)\n"
-                    + "{onfoot} - On foot status\n"
-                    + "{intaxi} - In taxi status\n"
-                    + "{inmulticrew} - In multicrew\n"
-                    + "{onfootinstation} - On foot in station\n"
-                    + "{onfootonplanet} - On foot on planet\n"
-                    + "{aimdownsight} - Aiming down sight\n"
-                    + "{lowoxygen} - Low oxygen warning\n"
-                    + "{lowhealth} - Low health warning\n"
-                    + "{cold} - Cold status\n"
-                    + "{hot} - Hot status\n"
-                    + "{verycold} - Very cold status\n"
-                    + "{veryhot} - Very hot status\n"
-                    + "{glidemode} - Gliding status\n"
-                    + "{onfootinhangar} - On foot in hangar\n"
-                    + "{onfootinsocialspace} - On foot in social space\n"
-                    + "{onfootexterior} - On foot exterior\n"
-                    + "{breathableatmosphere} - Breathable atmosphere\n"
-                    + "{telepresencemulticrew} - Telepresence multicrew\n"
-                    + "{physicalmulticrew} - Physical multicrew\n"
-                    + "{fsdhyperdrivecharging} - FSD hyperdrive charging",
-                "Image Metadata Tokens",
-                MessageBoxButtons.OK,
-                MessageBoxIcon.Information
-            );
+            var referenceForm = new TokenReferenceForm(FilenameTextbox);
+            _core?.RegisterControl(referenceForm);
+            referenceForm.Show();
         }
 
         private void LoadPresetButton_Click(object sender, EventArgs e)
@@ -420,6 +358,55 @@ namespace Observatory.Photographer.UI
         private void SeparateCheckbox_CheckedChanged(object sender, EventArgs e)
         {
             _saveAction.SeparateOutput = SeparateCheckbox.Checked;
+        }
+
+        public static string GetFontPath(Font font)
+        {
+            List<string> allFonts = [
+                .. Directory.GetFiles(Environment.GetFolderPath(Environment.SpecialFolder.Fonts)),
+                .. Directory.GetFiles(
+                    Path.Join(
+                        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                        "Microsoft",
+                        "Windows",
+                        "Fonts"
+                    )
+                )
+                ];
+
+            var fontMatch =
+                SearchForFontMatch(allFonts, font, false)
+                ?? SearchForFontMatch(allFonts, font, true);
+
+            return fontMatch ?? string.Empty;
+        }
+
+        private static string? SearchForFontMatch(List<string> files, Font font, bool matchPartial)
+        {
+            foreach (var fontFile in files)
+            {
+                try
+                {
+                    using var privateFontCollection =
+                        new System.Drawing.Text.PrivateFontCollection();
+                    privateFontCollection.AddFontFile(fontFile);
+                    if (
+                        privateFontCollection.Families.Any(f =>
+                            matchPartial
+                                ? f.Name.Contains(font.FontFamily.Name)
+                                : f.Name == font.FontFamily.Name
+                        )
+                    )
+                    {
+                        return fontFile;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Error loading font file {fontFile}: {ex.Message}");
+                }
+            }
+            return null;
         }
     }
 }

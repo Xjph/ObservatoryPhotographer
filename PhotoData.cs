@@ -69,35 +69,41 @@ namespace Observatory.Photographer
         }
 
         private IEnumerable<PhotoAction> DeserializeActions(object[] actions) =>
-            actions.Select(action =>
-            {
-                try
+            actions
+                .Select(action =>
                 {
-                    var jsonAction = (JsonElement)action;
-                    var actionType = (PhotoActionKind)jsonAction.GetProperty("Action").GetInt32();
-                    PhotoAction? deserializedAction = actionType switch
+                    try
                     {
-                        PhotoActionKind.Save => jsonAction.Deserialize<SaveAction>(),
-                        PhotoActionKind.Resize => jsonAction.Deserialize<ResizeAction>(),
-                        PhotoActionKind.Caption => jsonAction.Deserialize<CaptionAction>(),
-                        PhotoActionKind.Watermark => jsonAction.Deserialize<WatermarkAction>(),
-                        _ => throw new InvalidOperationException("Unknown action type in settings"),
-                    };
-                    if (deserializedAction == null)
-                    {
-                        throw new InvalidOperationException(
-                            $"Deserialization returned null for action {actionType}."
-                        );
+                        var jsonAction = (JsonElement)action;
+                        var actionType = (PhotoActionKind)
+                            jsonAction.GetProperty("Action").GetInt32();
+                        PhotoAction? deserializedAction = actionType switch
+                        {
+                            PhotoActionKind.Save => jsonAction.Deserialize<SaveAction>(),
+                            PhotoActionKind.Resize => jsonAction.Deserialize<ResizeAction>(),
+                            PhotoActionKind.Caption => jsonAction.Deserialize<CaptionAction>(),
+                            PhotoActionKind.Watermark => jsonAction.Deserialize<WatermarkAction>(),
+                            _ => throw new InvalidOperationException(
+                                "Unknown action type in settings"
+                            ),
+                        };
+                        if (deserializedAction == null)
+                        {
+                            throw new InvalidOperationException(
+                                $"Deserialization returned null for action {actionType}."
+                            );
+                        }
+                        return deserializedAction;
                     }
-                    return deserializedAction;
-                }
-                catch (Exception ex)
-                {
-                    // If deserialization fails for any reason, skip this action.
-                    _errorLogger(ex, "Failed to deserialize photo action.");
-                    return null;
-                }
-            }).Where(action => action != null).Select(a => a!);
+                    catch (Exception ex)
+                    {
+                        // If deserialization fails for any reason, skip this action.
+                        _errorLogger(ex, "Failed to deserialize photo action.");
+                        return null;
+                    }
+                })
+                .Where(action => action != null)
+                .Select(a => a!);
 
         private T? DeserializeOrDefault<T>(string json)
         {

@@ -1,10 +1,7 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 using System.Text.Json;
 using ImageMagick;
 using Observatory.Framework.Files.ParameterTypes;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
-using static Observatory.Photographer.ImageUtils;
 
 namespace Observatory.Photographer
 {
@@ -503,18 +500,18 @@ namespace Observatory.Photographer
 
             var captionSettings = new MagickReadSettings()
             {
-                Font = action.Font.Name,
+                Font = action.FontPath,
                 TextGravity = Gravity.Northwest,
                 FillColor = action.Color,
                 BackgroundColor = MagickColors.Transparent,
-                FontPointsize = action.Font.SizeInPoints * fontScale,
+                FontPointsize = action.FontSize * fontScale,
             };
 
             using var caption = new MagickImage(
-                $"caption:{FillTokenizedString(action.Text, imageData, action.CmdrName)}",
+                $"label:{FillTokenizedString(action.Text, imageData, action.CmdrName)}",
                 captionSettings
             );
-            System.Diagnostics.Debugger.Break();
+
             LocateAndComposite(
                 action.LocationMethod,
                 action.Quad,
@@ -542,7 +539,7 @@ namespace Observatory.Photographer
                     ex
                 );
             }
-            System.Diagnostics.Debugger.Break();
+
             LocateAndComposite(
                 action.LocationMethod,
                 action.Quad,
@@ -588,8 +585,9 @@ namespace Observatory.Photographer
 
             var filename = FillTokenizedString(action.FilePattern, imageData, action.CmdrName);
             var sanitizedCharacters = filename
-                .Where(c => !Path.GetInvalidFileNameChars().Contains(c))
+                .Where(c => !Path.GetInvalidPathChars().Contains(c))
                 .ToArray();
+
             filename = new string(sanitizedCharacters);
 
             if (!action.SeparateOutput)
@@ -622,6 +620,11 @@ namespace Observatory.Photographer
             }
 
             var fullPath = Path.Combine(action.FolderPath, filename);
+            var dirPath = Path.GetDirectoryName(fullPath);
+            if (!string.IsNullOrWhiteSpace(dirPath) && !Directory.Exists(dirPath))
+            {
+                Directory.CreateDirectory(dirPath);
+            }
 
             image.Format = action.Format;
             image.Quality = action.Quality;

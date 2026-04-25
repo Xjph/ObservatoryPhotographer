@@ -61,7 +61,9 @@ namespace Observatory.Photographer
             get => PhotoActionKind.Caption;
         }
         public string Text { get; set; } = string.Empty;
-        public required Font Font { get; set; }
+        public string FontPath { get; set; } = string.Empty;
+        public string FontFamily { get; set; } = string.Empty;
+        public uint FontSize { get; set; } = 12;
         public MagickColor Color { get; set; } = new();
         public int QuadValue { get; set; }
         public ImageUtils.Quad Quad
