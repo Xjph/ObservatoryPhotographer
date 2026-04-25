@@ -1,4 +1,5 @@
-﻿using Observatory.Framework.Interfaces;
+﻿using ImageMagick;
+using Observatory.Framework.Interfaces;
 
 namespace Observatory.Photographer.UI
 {
@@ -37,7 +38,13 @@ namespace Observatory.Photographer.UI
                 var meta = Photographer?.GetImageMetadata(PhotoView.SelectedItems[0].ImageKey);
                 if (meta is not null)
                 {
-                    var processForm = new ProcessForm(meta, Core, Worker);
+                    // Clone image so original isn't modified by processing.
+                    var clonedMeta = new ImageWithMetadata(
+                        new MagickImage(meta.Image.Clone()),
+                        meta.Screenshot,
+                        meta.Status
+                    );
+                    var processForm = new ProcessForm(clonedMeta, Core, Worker);
                     Core?.RegisterControl(processForm);
                     processForm.ShowDialog();
                 }
