@@ -2,6 +2,8 @@
 {
     public partial class WatermarkForm : Form
     {
+        private bool _loading = true;
+
         public WatermarkAction WatermarkAction { get; private set; }
 
         public WatermarkForm(WatermarkAction watermarkAction)
@@ -23,6 +25,7 @@
                 PathTextbox.BackColor = Color.White;
                 PopulateQuads();
                 LoadAction();
+                _loading = false;
             }
         }
 
@@ -51,8 +54,8 @@
 
         private void PopulateQuads()
         {
-            LocationQuadDropdown.Items.Clear();
             int prevIndex = LocationQuadDropdown.SelectedIndex;
+            LocationQuadDropdown.Items.Clear();
             if (QuadOrderCheckbox.Checked)
             {
                 LocationQuadDropdown.Items.AddRange([
@@ -73,7 +76,14 @@
                     "Bottom-Left Of Bottom-Right",
                     "Bottom-Right Of Bottom-Right",
                 ]);
-                LocationQuadDropdown.SelectedIndex = prevIndex * 4;
+                try
+                {
+                    LocationQuadDropdown.SelectedIndex = prevIndex * 4;
+                }
+                catch
+                {
+                    LocationQuadDropdown.SelectedIndex = 0;
+                }
             }
             else
             {
@@ -83,7 +93,14 @@
                     "Bottom-Left",
                     "Bottom-Right",
                 ]);
-                LocationQuadDropdown.SelectedIndex = prevIndex / 4;
+                try
+                {
+                    LocationQuadDropdown.SelectedIndex = prevIndex / 4;
+                }
+                catch
+                {
+                    LocationQuadDropdown.SelectedIndex = 0;
+                }
             }
         }
 
@@ -117,8 +134,10 @@
         private void LocationRadioChanged(object sender, EventArgs e)
         {
             AutoOrderCheckbox.Enabled = AutomaticLocationRadio.Checked;
+            AutoOrderCheckbox.Visible = AutomaticLocationRadio.Checked;
             LocationQuadDropdown.Enabled = LocationQuadRadio.Checked;
             QuadOrderCheckbox.Enabled = LocationQuadRadio.Checked;
+            QuadOrderCheckbox.Visible = LocationQuadRadio.Checked;
             LocationXSpinner.Enabled = LocationSpecificRadio.Checked;
             LocationYSpinner.Enabled = LocationSpecificRadio.Checked;
             LocationRelativeCheckbox.Enabled = LocationSpecificRadio.Checked;
@@ -133,11 +152,13 @@
         {
             PopulateQuads();
             WatermarkAction.SecondOrder = QuadOrderCheckbox.Checked;
+            AutoOrderCheckbox.Checked = QuadOrderCheckbox.Checked;
         }
 
         private void AutoOrderCheckbox_CheckedChanged(object sender, EventArgs e)
         {
             WatermarkAction.SecondOrder = AutoOrderCheckbox.Checked;
+            QuadOrderCheckbox.Checked = AutoOrderCheckbox.Checked;
         }
 
         private void PathTextbox_TextChanged(object sender, EventArgs e)
@@ -164,7 +185,8 @@
 
         private void LocationQuadDropdown_SelectedIndexChanged(object sender, EventArgs e)
         {
-            WatermarkAction.QuadValue = LocationQuadDropdown.SelectedIndex;
+            if (!_loading)
+                WatermarkAction.QuadValue = LocationQuadDropdown.SelectedIndex;
         }
 
         private void LocationXSpinner_ValueChanged(object sender, EventArgs e)

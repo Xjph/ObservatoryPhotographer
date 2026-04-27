@@ -16,10 +16,10 @@ namespace Observatory.Photographer.UI
         private ResizeAction _resizeAction;
         private readonly IObservatoryCore? _core;
         private readonly PhotoData _photoData;
-        private readonly PhotoWorker? _worker;
+        private readonly PhotoWorker _worker;
         private string _currentPreset = string.Empty;
 
-        public ProcessForm(ImageWithMetadata metadata, IObservatoryCore? core, PhotoWorker? worker)
+        public ProcessForm(ImageWithMetadata metadata, IObservatoryCore core, PhotoWorker worker)
         {
             _image = metadata;
             _captionAction = new()
@@ -27,16 +27,16 @@ namespace Observatory.Photographer.UI
                 FontPath = GetFontPath(Font),
                 FontFamily = Font.FontFamily.Name,
                 FontSize = (uint)Font.Size,
-                CmdrName = worker?.CmdrName ?? "CMDR",
+                CmdrName = worker.CmdrName ?? "CMDR",
             };
             _watermarkAction = new() { WatermarkImagePath = string.Empty };
             _saveAction = new()
             {
                 Format = MagickFormat.Png,
                 FolderPath = ((PhotoSettings)worker.Settings).OutputLocationPath,
-                FilePattern = "image",
-                CmdrName = worker?.CmdrName ?? "CMDR",
-                IncludeMetadata = false,
+                FilePattern = "{cmdr}-{system}-{timestamp}",
+                CmdrName = worker.CmdrName ?? "CMDR",
+                IncludeMetadata = true,
                 SeparateOutput = false,
             };
             _resizeAction = new()
@@ -53,8 +53,8 @@ namespace Observatory.Photographer.UI
             RestoreSavedProcess();
             _captionForm = new(_captionAction);
             _watermarkForm = new(_watermarkAction);
-            core?.RegisterControl(_captionForm);
-            core?.RegisterControl(_watermarkForm);
+            core.RegisterControl(_captionForm);
+            core.RegisterControl(_watermarkForm);
             FilenameTooltip.SetToolTip(ExampleLabel, string.Empty);
         }
 
@@ -138,7 +138,7 @@ namespace Observatory.Photographer.UI
             try
             {
                 var defaultAction =
-                    ((PhotoSettings?)_worker?.Settings)?.DefaultPreset ?? string.Empty;
+                    ((PhotoSettings?)_worker.Settings)?.DefaultPreset ?? string.Empty;
                 _photoData.SavedPresets.TryGetValue(
                     defaultAction,
                     out IEnumerable<PhotoAction>? defaultActions
@@ -156,11 +156,15 @@ namespace Observatory.Photographer.UI
 
         private void CaptionButton_Click(object sender, EventArgs e)
         {
+            _captionForm.StartPosition = FormStartPosition.Manual;
+            _captionForm.Location = Point.Add(Location, new Size(100, 100));
             _captionForm.ShowDialog();
         }
 
         private void WatermarkButton_Click(object sender, EventArgs e)
         {
+            _watermarkForm.StartPosition = FormStartPosition.Manual;
+            _watermarkForm.Location = Point.Add(Location, new Size(100, 100));
             _watermarkForm.ShowDialog();
         }
 
@@ -317,23 +321,31 @@ namespace Observatory.Photographer.UI
             FilenameTooltip.SetToolTip(ExampleLabel, ExampleLabel.Text);
         }
 
+        private void OpenReferenceForm(TextBox textBox)
+        {
+            var referenceForm = new TokenReferenceForm(textBox);
+            _core?.RegisterControl(referenceForm);
+            referenceForm.StartPosition = FormStartPosition.Manual;
+            referenceForm.Location = Point.Add(Location, new Size(Width, 0));
+            referenceForm.Show();
+        }
+
         private void CaptionLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            var referenceForm = new TokenReferenceForm(CaptionTextbox);
-            _core?.RegisterControl(referenceForm);
-            referenceForm.Show();
+            OpenReferenceForm(CaptionTextbox);
         }
 
         private void FilenameLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            var referenceForm = new TokenReferenceForm(FilenameTextbox);
-            _core?.RegisterControl(referenceForm);
-            referenceForm.Show();
+            OpenReferenceForm(FilenameTextbox);
         }
 
         private void LoadPresetButton_Click(object sender, EventArgs e)
         {
             var presetForm = new PresetForm(_photoData);
+            _core?.RegisterControl(presetForm);
+            presetForm.StartPosition = FormStartPosition.Manual;
+            presetForm.Location = Point.Add(Location, new Size(100, 100));
             var result = presetForm.ShowDialog();
             if (result == DialogResult.OK)
             {
@@ -345,6 +357,9 @@ namespace Observatory.Photographer.UI
         private void SavePresetButton_Click(object sender, EventArgs e)
         {
             var presetForm = new PresetForm(_photoData, true) { PresetAction = BuildActionList() };
+            _core?.RegisterControl(presetForm);
+            presetForm.StartPosition = FormStartPosition.Manual;
+            presetForm.Location = Point.Add(Location, new Size(100, 100));
             var result = presetForm.ShowDialog();
             if (result == DialogResult.OK)
                 _currentPreset = presetForm.PresetName;
@@ -362,7 +377,8 @@ namespace Observatory.Photographer.UI
 
         public static string GetFontPath(Font font)
         {
-            List<string> allFonts = [
+            List<string> allFonts =
+            [
                 .. Directory.GetFiles(Environment.GetFolderPath(Environment.SpecialFolder.Fonts)),
                 .. Directory.GetFiles(
                     Path.Join(
@@ -371,8 +387,8 @@ namespace Observatory.Photographer.UI
                         "Windows",
                         "Fonts"
                     )
-                )
-                ];
+                ),
+            ];
 
             var fontMatch =
                 SearchForFontMatch(allFonts, font, false)

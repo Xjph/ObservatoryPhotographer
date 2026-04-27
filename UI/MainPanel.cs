@@ -44,8 +44,13 @@ namespace Observatory.Photographer.UI
                         meta.Screenshot,
                         meta.Status
                     );
-                    var processForm = new ProcessForm(clonedMeta, Core, Worker);
+                    var processForm = new ProcessForm(clonedMeta, Core!, Worker!);
                     Core?.RegisterControl(processForm);
+                    processForm.StartPosition = FormStartPosition.Manual;
+                    processForm.Location = Point.Add(
+                        Application.OpenForms[0]?.Location ?? Point.Empty,
+                        new Size(100, 100)
+                    );
                     processForm.ShowDialog();
                 }
             }

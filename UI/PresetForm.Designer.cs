@@ -30,10 +30,9 @@
         {
             SavedPresetLabel = new Label();
             SavedPresetDropdown = new ComboBox();
-            PresetNameText = new TextBox();
-            SaveNameLabel = new Label();
             CancelButton = new Button();
             SaveLoadButton = new Button();
+            DeleteButton = new Button();
             SuspendLayout();
             // 
             // SavedPresetLabel
@@ -53,36 +52,13 @@
             SavedPresetDropdown.Name = "SavedPresetDropdown";
             SavedPresetDropdown.Size = new Size(216, 23);
             SavedPresetDropdown.TabIndex = 1;
-            SavedPresetDropdown.SelectedIndexChanged += SavedPresetDropdown_SelectedIndexChanged;
-            // 
-            // PresetNameText
-            // 
-            PresetNameText.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            PresetNameText.Enabled = false;
-            PresetNameText.Location = new Point(115, 35);
-            PresetNameText.Name = "PresetNameText";
-            PresetNameText.Size = new Size(216, 23);
-            PresetNameText.TabIndex = 2;
-            PresetNameText.Visible = false;
-            PresetNameText.TextChanged += PresetNameText_TextChanged;
-            // 
-            // SaveNameLabel
-            // 
-            SaveNameLabel.AutoSize = true;
-            SaveNameLabel.Enabled = false;
-            SaveNameLabel.Location = new Point(12, 38);
-            SaveNameLabel.Name = "SaveNameLabel";
-            SaveNameLabel.Size = new Size(77, 15);
-            SaveNameLabel.TabIndex = 3;
-            SaveNameLabel.Text = "Preset Name:";
-            SaveNameLabel.Visible = false;
             // 
             // CancelButton
             // 
             CancelButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             CancelButton.FlatAppearance.BorderSize = 0;
             CancelButton.FlatStyle = FlatStyle.Flat;
-            CancelButton.Location = new Point(256, 64);
+            CancelButton.Location = new Point(256, 38);
             CancelButton.Name = "CancelButton";
             CancelButton.Size = new Size(75, 23);
             CancelButton.TabIndex = 4;
@@ -95,7 +71,7 @@
             SaveLoadButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             SaveLoadButton.FlatAppearance.BorderSize = 0;
             SaveLoadButton.FlatStyle = FlatStyle.Flat;
-            SaveLoadButton.Location = new Point(175, 64);
+            SaveLoadButton.Location = new Point(175, 38);
             SaveLoadButton.Name = "SaveLoadButton";
             SaveLoadButton.Size = new Size(75, 23);
             SaveLoadButton.TabIndex = 5;
@@ -103,15 +79,27 @@
             SaveLoadButton.UseVisualStyleBackColor = true;
             SaveLoadButton.Click += SaveLoadButton_Click;
             // 
+            // DeleteButton
+            // 
+            DeleteButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            DeleteButton.FlatAppearance.BorderSize = 0;
+            DeleteButton.FlatStyle = FlatStyle.Flat;
+            DeleteButton.Location = new Point(12, 38);
+            DeleteButton.Name = "DeleteButton";
+            DeleteButton.Size = new Size(75, 23);
+            DeleteButton.TabIndex = 6;
+            DeleteButton.Text = "Delete";
+            DeleteButton.UseVisualStyleBackColor = true;
+            DeleteButton.Click += DeleteButton_Click;
+            // 
             // PresetForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(343, 98);
+            ClientSize = new Size(343, 72);
+            Controls.Add(DeleteButton);
             Controls.Add(SaveLoadButton);
             Controls.Add(CancelButton);
-            Controls.Add(SaveNameLabel);
-            Controls.Add(PresetNameText);
             Controls.Add(SavedPresetDropdown);
             Controls.Add(SavedPresetLabel);
             FormBorderStyle = FormBorderStyle.FixedToolWindow;
@@ -125,9 +113,8 @@
 
         private Label SavedPresetLabel;
         private ComboBox SavedPresetDropdown;
-        private TextBox PresetNameText;
-        private Label SaveNameLabel;
         private Button CancelButton;
         private Button SaveLoadButton;
+        private Button DeleteButton;
     }
 }

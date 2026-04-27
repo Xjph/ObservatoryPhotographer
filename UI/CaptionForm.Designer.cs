@@ -250,6 +250,7 @@
             Controls.Add(FontButton);
             Controls.Add(FontSampleLabel);
             Controls.Add(FontLabel);
+            FormBorderStyle = FormBorderStyle.FixedToolWindow;
             Name = "CaptionForm";
             Text = "Caption Setup";
             LocationGroup.ResumeLayout(false);

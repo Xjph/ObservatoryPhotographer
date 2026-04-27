@@ -20,14 +20,6 @@
             {
                 Text = "Save Preset";
                 SaveLoadButton.Text = "Save";
-                SaveNameLabel.Enabled = true;
-                SaveNameLabel.Visible = true;
-                PresetNameText.Enabled = true;
-                PresetNameText.Visible = true;
-            }
-            else
-            {
-                Height -= 23;
             }
             LoadPresets();
         }
@@ -47,10 +39,11 @@
             {
                 if (SaveLoadButton.Text == "Save")
                 {
-                    if (_photoData.SavedPresets.ContainsKey(PresetNameText.Text))
+                    var presetName = SavedPresetDropdown.Text;
+                    if (_photoData.SavedPresets.ContainsKey(presetName))
                     {
                         var result = MessageBox.Show(
-                            "A preset with this name already exists. Do you want to overwrite it?",
+                            $"A preset named \"{presetName}\" already exists. Do you want to overwrite?",
                             "Confirm Overwrite",
                             MessageBoxButtons.YesNo,
                             MessageBoxIcon.Warning
@@ -59,24 +52,24 @@
                         {
                             return;
                         }
-                        _photoData.SavedPresets[PresetNameText.Text] = PresetAction;
+                        _photoData.SavedPresets[presetName] = PresetAction;
                     }
                     else
                     {
-                        _photoData.SavedPresets.Add(PresetNameText.Text, PresetAction);
+                        _photoData.SavedPresets.Add(presetName, PresetAction);
                     }
                     _photoData.SavePresets();
-                    PresetName = PresetNameText.Text;
+                    PresetName = presetName;
                 }
                 else
                 {
                     _presetAction =
                     [
                         .. _photoData.SavedPresets[
-                            SavedPresetDropdown.SelectedItem?.ToString() ?? string.Empty
+                            SavedPresetDropdown.Text
                         ],
                     ];
-                    PresetName = SavedPresetDropdown.SelectedItem?.ToString() ?? string.Empty;
+                    PresetName = SavedPresetDropdown.Text;
                 }
                 DialogResult = DialogResult.OK;
                 Close();
@@ -101,16 +94,37 @@
             Close();
         }
 
-        private void SavedPresetDropdown_SelectedIndexChanged(object? sender, EventArgs e)
+        private void DeleteButton_Click(object sender, EventArgs e)
         {
-            PresetNameText.TextChanged -= PresetNameText_TextChanged;
-            PresetNameText.Text = SavedPresetDropdown.SelectedItem?.ToString() ?? string.Empty;
-            PresetNameText.TextChanged += PresetNameText_TextChanged;
-        }
-
-        private void PresetNameText_TextChanged(object? sender, EventArgs e)
-        {
-            SavedPresetDropdown.SelectedItem = null;
+            try
+            {
+                var presetName = SavedPresetDropdown.Text;
+                if (_photoData.SavedPresets.ContainsKey(presetName))
+                {
+                    var result = MessageBox.Show(
+                        $"Are you sure you want to delete the \"{presetName}\" preset?",
+                        "Confirm Delete",
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Warning
+                    );
+                    if (result == DialogResult.No)
+                    {
+                        return;
+                    }
+                    _photoData.SavedPresets.Remove(presetName);
+                    _photoData.SavePresets();
+                    SavedPresetDropdown.Items.Remove(presetName);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    $"An error occurred while deleting the preset: {ex.Message}{Environment.NewLine}No preset has been deleted.",
+                    "Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error
+                );
+            }
         }
     }
 }
