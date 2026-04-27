@@ -280,6 +280,23 @@ namespace Observatory.Photographer
             };
         }
 
+        private static string FormatDegrees(float degrees, bool isLatitude, bool useDMS)
+        {
+            var absDegrees = Math.Abs(degrees);
+            var direction = isLatitude
+                    ? degrees >= 0 ? "N" : "S"
+                    : degrees >= 0 ? "E" : "W";
+            if (!useDMS)
+                return $"{absDegrees:0.####}° {direction}";
+            
+            var d = Math.Floor(absDegrees);
+            var m = Math.Floor((absDegrees - d) * 60);
+            var s = (absDegrees - d - m / 60) * 3600;
+                
+            return $"{d}°{m}'{s:0.##}\" {direction}";
+
+        }
+
         private static Dictionary<string, string> lookupDict(
             string cmdrName,
             ImageWithMetadata metadata
@@ -288,8 +305,10 @@ namespace Observatory.Photographer
             {
                 { "cmdr", cmdrName ?? string.Empty },
                 // Screenshot properties
-                { "latitude", metadata.Screenshot.Latitude.ToString() },
-                { "longitude", metadata.Screenshot.Longitude.ToString() },
+                { "latitude", FormatDegrees(metadata.Screenshot.Latitude, true, true) },
+                { "longitude", FormatDegrees(metadata.Screenshot.Longitude, false, true) },
+                { "latitudeDMS", FormatDegrees(metadata.Screenshot.Latitude, true, false) },
+                { "longitudeDMS", FormatDegrees(metadata.Screenshot.Longitude, false, false) },
                 { "system", metadata.Screenshot.System ?? string.Empty },
                 { "body", metadata.Screenshot.Body ?? string.Empty },
                 { "altitude", metadata.Screenshot.Altitude.ToString() },

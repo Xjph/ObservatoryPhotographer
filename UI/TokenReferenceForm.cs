@@ -6,6 +6,9 @@
         {
             _relatedTextBox = relatedTextBox;
             InitializeComponent();
+            Width = 300;
+            Height = 350;
+            FormBorderStyle = FormBorderStyle.FixedToolWindow;
             BuildTokenLinks();
         }
 
@@ -22,28 +25,62 @@
                     Font = headerFont,
                 }
             );
-            LinkLabel? finalLink = null;
+            
             foreach (var token in ScreenshotTokens)
             {
                 var linkLabel = new LinkLabel { Text = token, AutoSize = true };
                 linkLabel.LinkClicked += LinkClicked;
                 LinkLayoutPanel.Controls.Add(linkLabel);
-                finalLink = linkLabel;
             }
-            LinkLayoutPanel.SetFlowBreak(finalLink ?? new LinkLabel(), true);
-            LinkLayoutPanel.Controls.Add(
+
+            List<Control> statusTokenControls = [];
+            Button showStatusButton = new()
+            {
+                Text = "Show Status Tokens",
+                AutoSize = true,
+                FlatAppearance = { BorderSize = 0 },
+                FlatStyle = FlatStyle.Flat,
+            };
+            showStatusButton.Click += (_,_) =>
+            {
+                bool show = showStatusButton.Text.Contains("Show");
+                foreach (var link in statusTokenControls)
+                {
+                    if (link is LinkLabel linkLabel)
+                        linkLabel.LinkColor = ((LinkLabel)LinkLayoutPanel.Controls[1]).LinkColor;
+                    else if (link is Label label)
+                        label.ForeColor = LinkLayoutPanel.Controls[0].ForeColor;
+
+                    if (show)
+                    {
+                        Width = 850;
+                        Height = 625;
+                        LinkLayoutPanel.Controls.Add(link);
+                    }
+                    else
+                    {
+                        Width = 300;
+                        Height = 350;
+                        LinkLayoutPanel.Controls.Remove(link);
+                    }
+                }
+                showStatusButton.Text = show ? "Hide Status Tokens" : "Show Status Tokens";
+            };
+            LinkLayoutPanel.Controls.Add(showStatusButton);
+            LinkLayoutPanel.SetFlowBreak(showStatusButton, true);
+            statusTokenControls.Add(
                 new Label()
                 {
                     Text = "Status Tokens (Not Always Available):",
                     AutoSize = true,
-                    Font = headerFont,
+                    Font = headerFont
                 }
             );
             foreach (var token in StatusTokens)
             {
                 var linkLabel = new LinkLabel { Text = token, AutoSize = true };
                 linkLabel.LinkClicked += LinkClicked;
-                LinkLayoutPanel.Controls.Add(linkLabel);
+                statusTokenControls.Add(linkLabel);
             }
         }
 
@@ -55,7 +92,6 @@
                 var selectionStart = _relatedTextBox.SelectionStart;
                 _relatedTextBox.Text = _relatedTextBox.Text.Insert(selectionStart, insertText);
                 _relatedTextBox.SelectionStart = selectionStart + insertText.Length;
-                _relatedTextBox.Focus();
             }
         }
 
@@ -64,6 +100,8 @@
             "{cmdr} - Commander name",
             "{latitude} - Latitude coordinate",
             "{longitude} - Longitude coordinate",
+            "{latitudeDMS} - Latitude in D°M'S\" format",
+            "{longitudeDMS} - Longitude in D°M'S\" format}",
             "{system} - System name",
             "{body} - Body name",
             "{altitude} - Altitude",
