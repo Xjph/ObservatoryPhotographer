@@ -284,17 +284,20 @@ namespace Observatory.Photographer
         {
             var absDegrees = Math.Abs(degrees);
             var direction = isLatitude
-                    ? degrees >= 0 ? "N" : "S"
-                    : degrees >= 0 ? "E" : "W";
+                ? degrees >= 0
+                    ? "N"
+                    : "S"
+                : degrees >= 0
+                    ? "E"
+                    : "W";
             if (!useDMS)
                 return $"{absDegrees:0.####}° {direction}";
-            
+
             var d = Math.Floor(absDegrees);
             var m = Math.Floor((absDegrees - d) * 60);
             var s = (absDegrees - d - m / 60) * 3600;
-                
-            return $"{d}°{m}'{s:0.##}\" {direction}";
 
+            return $"{d}°{m}'{s:0.##}\" {direction}";
         }
 
         private static Dictionary<string, string> lookupDict(
@@ -305,14 +308,14 @@ namespace Observatory.Photographer
             {
                 { "cmdr", cmdrName ?? string.Empty },
                 // Screenshot properties
-                { "latitude", FormatDegrees(metadata.Screenshot.Latitude, true, true) },
-                { "longitude", FormatDegrees(metadata.Screenshot.Longitude, false, true) },
-                { "latitudeDMS", FormatDegrees(metadata.Screenshot.Latitude, true, false) },
-                { "longitudeDMS", FormatDegrees(metadata.Screenshot.Longitude, false, false) },
+                { "latitude", FormatDegrees((float?)metadata.Status?.Latitude ?? metadata.Screenshot.Latitude, true, true) },
+                { "longitude", FormatDegrees((float?)metadata.Status?.Longitude ?? metadata.Screenshot.Longitude, false, true) },
+                { "latitudeDMS", FormatDegrees((float?)metadata.Status?.Latitude ?? metadata.Screenshot.Latitude, true, false) },
+                { "longitudeDMS", FormatDegrees((float?)metadata.Status?.Longitude ?? metadata.Screenshot.Longitude, false, false) },
                 { "system", metadata.Screenshot.System ?? string.Empty },
                 { "body", metadata.Screenshot.Body ?? string.Empty },
                 { "altitude", metadata.Screenshot.Altitude.ToString() },
-                { "heading", metadata.Screenshot.Heading.ToString() },
+                { "heading", metadata.Status?.Heading.ToString() ?? metadata.Screenshot.Heading.ToString() },
                 {
                     "timestamp",
                     metadata.Screenshot.TimestampDateTime.ToString("s").Replace(':', '-')
@@ -530,6 +533,14 @@ namespace Observatory.Photographer
                 $"label:{FillTokenizedString(action.Text, imageData, action.CmdrName)}",
                 captionSettings
             );
+
+            // Put it exactly where the user specified, otherwise
+            // add padding to avoid text being right on the edge.
+            if (action.LocationMethod != LocationMethod.Manual)
+            {
+                caption.BorderColor = MagickColors.Transparent;
+                caption.Border((uint)Math.Round(10 * fontScale));
+            }
 
             LocateAndComposite(
                 action.LocationMethod,
