@@ -88,6 +88,7 @@
             PhotoView.Location = new Point(3, 3);
             PhotoView.Name = "PhotoView";
             PhotoView.Size = new Size(474, 390);
+            PhotoView.Sorting = SortOrder.Ascending;
             PhotoView.TabIndex = 0;
             PhotoView.UseCompatibleStateImageBehavior = false;
             // 

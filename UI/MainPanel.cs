@@ -12,6 +12,8 @@ namespace Observatory.Photographer.UI
         public MainPanel()
         {
             InitializeComponent();
+            var comparer = new PhotoViewComparer();
+            PhotoView.ListViewItemSorter = new PhotoViewComparer();
         }
 
         public Panel PhotoPanel => FlowPanel;

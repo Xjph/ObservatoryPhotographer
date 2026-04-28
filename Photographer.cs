@@ -157,13 +157,16 @@ namespace Observatory.Photographer
                                 }
 
                                 UiExec(() =>
+                                {
                                     _ui.PhotoListView.Items.Add(
                                         new ListViewItem(screenshot.System)
                                         {
                                             ImageKey = file.FullName,
+                                            Tag = screenshot.TimestampDateTime,
                                         }
-                                    )
-                                );
+                                    );
+                                    _ui.PhotoListView.Sort();
+                                });
                                 _imageData[file.FullName] = new(original, screenshot, status);
 
                                 if (ProceedWithProcessing(_core.CurrentLogMonitorState))
