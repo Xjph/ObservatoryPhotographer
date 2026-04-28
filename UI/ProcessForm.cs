@@ -203,7 +203,7 @@ namespace Observatory.Photographer.UI
             catch (Exception ex)
             {
                 _mainPanel?.Photographer?.Errorlogger(ex, "Failed to restore saved process.");
-                actionList = [];
+                actionList = [_saveAction];
             }
 
             UpdateUIFromActionList(actionList);
@@ -432,17 +432,28 @@ namespace Observatory.Photographer.UI
 
         public static string GetFontPath(Font font)
         {
+            var userFontDir = Path.Join(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "Microsoft",
+                "Windows",
+                "Fonts"
+            );
+
             List<string> allFonts =
             [
                 .. Directory.GetFiles(Environment.GetFolderPath(Environment.SpecialFolder.Fonts)),
-                .. Directory.GetFiles(
-                    Path.Join(
-                        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                        "Microsoft",
-                        "Windows",
-                        "Fonts"
+                .. Directory.Exists(userFontDir)
+                    ? Directory.GetFiles(
+                        Path.Join(
+                            Environment.GetFolderPath(
+                                Environment.SpecialFolder.LocalApplicationData
+                            ),
+                            "Microsoft",
+                            "Windows",
+                            "Fonts"
+                        )
                     )
-                ),
+                    : [],
             ];
 
             var fontMatch =
