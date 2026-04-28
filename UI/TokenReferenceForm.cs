@@ -25,7 +25,7 @@
                     Font = headerFont,
                 }
             );
-            
+
             foreach (var token in ScreenshotTokens)
             {
                 var linkLabel = new LinkLabel { Text = token, AutoSize = true };
@@ -41,7 +41,7 @@
                 FlatAppearance = { BorderSize = 0 },
                 FlatStyle = FlatStyle.Flat,
             };
-            showStatusButton.Click += (_,_) =>
+            showStatusButton.Click += (_, _) =>
             {
                 bool show = showStatusButton.Text.Contains("Show");
                 foreach (var link in statusTokenControls)
@@ -73,7 +73,7 @@
                 {
                     Text = "Status Tokens (Not Always Available):",
                     AutoSize = true,
-                    Font = headerFont
+                    Font = headerFont,
                 }
             );
             foreach (var token in StatusTokens)
