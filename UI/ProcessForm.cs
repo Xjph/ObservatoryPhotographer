@@ -58,6 +58,61 @@ namespace Observatory.Photographer.UI
             FilenameTooltip.SetToolTip(ExampleLabel, string.Empty);
         }
 
+        public ProcessForm(IObservatoryCore core, PhotoWorker worker)
+        {
+            _image = new(
+                new(MagickColors.White, 1, 1),
+                new()
+                {
+                    System = "ExampleSystem",
+                    Body = "ExampleBody",
+                    Timestamp = DateTime.Now.ToString(),
+                    Latitude = 12.34f,
+                    Longitude = 56.78f,
+                    Altitude = 910f,
+                    Heading = 180,
+                }
+            );
+
+            _captionAction = new()
+            {
+                FontPath = GetFontPath(Font),
+                FontFamily = Font.FontFamily.Name,
+                FontSize = (uint)Font.Size,
+                CmdrName = worker.CmdrName ?? "CMDR",
+            };
+            _watermarkAction = new() { WatermarkImagePath = string.Empty };
+            _saveAction = new()
+            {
+                Format = MagickFormat.Png,
+                FolderPath = ((PhotoSettings)worker.Settings).OutputLocationPath,
+                FilePattern = "{cmdr}-{system}-{timestamp}",
+                CmdrName = worker.CmdrName ?? "CMDR",
+                IncludeMetadata = true,
+                SeparateOutput = false,
+            };
+            _resizeAction = new()
+            {
+                X = 100,
+                Y = 100,
+                Relative = true,
+            };
+            _core = core;
+            _worker = worker;
+            _photoData = new(core, core.GetPluginErrorLogger(worker));
+            InitializeComponent();
+            RestoreSavedProcess();
+            CancelButton = CancelBtn;
+            OkButton.Visible = false;
+            OkButton.Enabled = false;
+            Text = "Manage Process Preset";
+            _captionForm = new(_captionAction);
+            _watermarkForm = new(_watermarkAction);
+            core.RegisterControl(_captionForm);
+            core.RegisterControl(_watermarkForm);
+            FilenameTooltip.SetToolTip(ExampleLabel, string.Empty);
+        }
+
         private void UpdateUIFromActionList(IEnumerable<PhotoAction> actionList)
         {
             foreach (var action in actionList)

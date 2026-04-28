@@ -54,6 +54,17 @@ namespace Observatory.Photographer.UI
                     processForm.ShowDialog();
                 }
             }
+            else
+            {
+                var processForm = new ProcessForm(Core!, Worker!);
+                Core?.RegisterControl(processForm);
+                processForm.StartPosition = FormStartPosition.Manual;
+                processForm.Location = Point.Add(
+                    Application.OpenForms[0]?.Location ?? Point.Empty,
+                    new Size(100, 100)
+                );
+                processForm.ShowDialog();
+            }
         }
     }
 }

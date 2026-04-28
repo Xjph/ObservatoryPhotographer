@@ -63,12 +63,7 @@
                 }
                 else
                 {
-                    _presetAction =
-                    [
-                        .. _photoData.SavedPresets[
-                            SavedPresetDropdown.Text
-                        ],
-                    ];
+                    _presetAction = [.. _photoData.SavedPresets[SavedPresetDropdown.Text]];
                     PresetName = SavedPresetDropdown.Text;
                 }
                 DialogResult = DialogResult.OK;
