@@ -202,7 +202,19 @@ namespace Observatory.Photographer
                 _settings.DefaultPreset,
                 out IEnumerable<PhotoAction>? defaultActions
             );
-            return defaultActions ?? [];
+            return defaultActions
+                ??
+                [
+                    new SaveAction()
+                    {
+                        Format = MagickFormat.Png,
+                        FilePattern = "{cmdr}_{system}_{timestamp}",
+                        FolderPath = _settings.OutputLocationPath,
+                        IncludeMetadata = true,
+                        SeparateOutput = false,
+                        CmdrName = _ui.Worker?.CmdrName ?? "Unknown",
+                    },
+                ];
         }
 
         public ImageWithMetadata? GetImageMetadata(string imageKey)
