@@ -308,14 +308,45 @@ namespace Observatory.Photographer
             {
                 { "cmdr", cmdrName ?? string.Empty },
                 // Screenshot properties
-                { "latitude", FormatDegrees((float?)metadata.Status?.Latitude ?? metadata.Screenshot.Latitude, true, true) },
-                { "longitude", FormatDegrees((float?)metadata.Status?.Longitude ?? metadata.Screenshot.Longitude, false, true) },
-                { "latitudeDMS", FormatDegrees((float?)metadata.Status?.Latitude ?? metadata.Screenshot.Latitude, true, false) },
-                { "longitudeDMS", FormatDegrees((float?)metadata.Status?.Longitude ?? metadata.Screenshot.Longitude, false, false) },
+                {
+                    "latitude",
+                    FormatDegrees(
+                        (float?)metadata.Status?.Latitude ?? metadata.Screenshot.Latitude,
+                        true,
+                        false
+                    )
+                },
+                {
+                    "longitude",
+                    FormatDegrees(
+                        (float?)metadata.Status?.Longitude ?? metadata.Screenshot.Longitude,
+                        false,
+                        false
+                    )
+                },
+                {
+                    "latitudeDMS",
+                    FormatDegrees(
+                        (float?)metadata.Status?.Latitude ?? metadata.Screenshot.Latitude,
+                        true,
+                        true
+                    )
+                },
+                {
+                    "longitudeDMS",
+                    FormatDegrees(
+                        (float?)metadata.Status?.Longitude ?? metadata.Screenshot.Longitude,
+                        false,
+                        true
+                    )
+                },
                 { "system", metadata.Screenshot.System ?? string.Empty },
                 { "body", metadata.Screenshot.Body ?? string.Empty },
                 { "altitude", metadata.Screenshot.Altitude.ToString() },
-                { "heading", metadata.Status?.Heading.ToString() ?? metadata.Screenshot.Heading.ToString() },
+                {
+                    "heading",
+                    metadata.Status?.Heading.ToString() ?? metadata.Screenshot.Heading.ToString()
+                },
                 {
                     "timestamp",
                     metadata.Screenshot.TimestampDateTime.ToString("s").Replace(':', '-')
