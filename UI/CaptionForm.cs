@@ -110,19 +110,34 @@
         private void FontButton_Click(object sender, EventArgs e)
         {
             FontDialog.ShowEffects = false;
-            var result = FontDialog.ShowDialog();
-
-            if (result == DialogResult.OK)
+            try
             {
-                FontSampleLabel.Text = FontDialog.Font.Name;
-                FontSampleLabel.Font = new(
-                    FontDialog.Font.FontFamily,
-                    FontSampleLabel.Font.Size,
-                    FontDialog.Font.Style
+                var result = FontDialog.ShowDialog();
+
+                if (result == DialogResult.OK)
+                {
+                    FontSampleLabel.Text = FontDialog.Font.Name;
+                    FontSampleLabel.Font = new(
+                        FontDialog.Font.FontFamily,
+                        FontSampleLabel.Font.Size,
+                        FontDialog.Font.Style
+                    );
+                    CaptionAction.FontPath = ProcessForm.GetFontPath(FontDialog.Font);
+                    CaptionAction.FontFamily = FontDialog.Font.FontFamily.Name;
+                    CaptionAction.FontSize = (uint)FontDialog.Font.Size;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    "An error occurred while attempting to use your selected font."
+                        + Environment.NewLine
+                        + Environment.NewLine
+                        + ex.Message,
+                    "Error Loading Font",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error
                 );
-                CaptionAction.FontPath = ProcessForm.GetFontPath(FontDialog.Font);
-                CaptionAction.FontFamily = FontDialog.Font.FontFamily.Name;
-                CaptionAction.FontSize = (uint)FontDialog.Font.Size;
             }
         }
 
