@@ -44,12 +44,18 @@ namespace Observatory.Photographer
                 AuthorName = "Vithigar",
                 FullName = "Observatory Photographer",
                 ShortName = "Photographer",
+                Description =
+                    "Manages screenshots taken by the user, allowing them to be automatically renamed and organized based on screenshot metadata.\r\n\r\nIt can also apply some simple post-processing, including resizing, addition text captions, or applying a watermark.",
+                Links =
+                [
+                    new("Documentation", "https://observatory.xjph.net/usage/plugins/photographer"),
+                ],
             };
 
         public static Guid Guid => new("AEA9A421-94FB-40D9-BCFF-AB899B279325");
 
         string IObservatoryPlugin.Version =>
-            typeof(PhotoWorker).Assembly.GetName().Version?.ToString() ?? "0";
+            (typeof(PhotoWorker).Assembly.GetName().Version?.ToString() ?? "0") + "-Patreon";
 
         PluginUI IObservatoryPlugin.PluginUI => _pluginUI;
 

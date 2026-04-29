@@ -101,7 +101,7 @@
             "{latitude} - Latitude coordinate",
             "{longitude} - Longitude coordinate",
             "{latitudeDMS} - Latitude in D°M'S\" format",
-            "{longitudeDMS} - Longitude in D°M'S\" format}",
+            "{longitudeDMS} - Longitude in D°M'S\" format",
             "{system} - System name",
             "{body} - Body name",
             "{altitude} - Altitude",
