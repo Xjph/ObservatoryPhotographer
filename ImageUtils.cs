@@ -493,8 +493,13 @@ namespace Observatory.Photographer
             var minIndex = quadSizes.ToList().IndexOf(minSize);
             if (twoPass)
             {
-                var nextOrderIndex = FindOpenQuad(new MagickImage(quads[minIndex]));
+                using var nextPass = new MagickImage(quads[minIndex]);
+                var nextOrderIndex = FindOpenQuad(nextPass);
                 minIndex = minIndex * 4 + nextOrderIndex;
+            }
+            foreach (var q in quads)
+            {
+                q.Dispose();
             }
             return minIndex;
         }

@@ -42,7 +42,7 @@ namespace Observatory.Photographer.UI
                 {
                     // Clone image so original isn't modified by processing.
                     var clonedMeta = new ImageWithMetadata(
-                        new MagickImage(meta.Image.Clone()),
+                        meta.Filename,
                         meta.Screenshot,
                         meta.Status
                     );

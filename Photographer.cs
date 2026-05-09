@@ -72,6 +72,11 @@ namespace Observatory.Photographer
             _imageData.Clear();
             UiExec(() =>
             {
+                if (_ui.PhotoListView.LargeImageList != null)
+                    foreach (Image img in _ui.PhotoListView.LargeImageList.Images)
+                    {
+                        img.Dispose();
+                    }
                 _ui.PhotoListView.Items.Clear();
                 _ui.PhotoListView.LargeImageList?.Images.Clear();
             });
@@ -97,7 +102,7 @@ namespace Observatory.Photographer
                                     imageItems = [.. _ui.PhotoListView.Items.Cast<ListViewItem>()]
                                 );
 
-                                MagickImage original = new(file.FullName);
+                                using MagickImage original = new(file.FullName);
                                 if (largeImageKeys.Contains(file.FullName))
                                 {
                                     var staleItem = imageItems.Where(item =>
@@ -167,7 +172,7 @@ namespace Observatory.Photographer
                                     );
                                     _ui.PhotoListView.Sort();
                                 });
-                                _imageData[file.FullName] = new(original, screenshot, status);
+                                _imageData[file.FullName] = new(file.FullName,screenshot, status);
 
                                 if (ProceedWithProcessing(_core.CurrentLogMonitorState))
                                 {
@@ -229,14 +234,12 @@ namespace Observatory.Photographer
 
         private static Bitmap MagickToBitmap(MagickImage magickImage, int width, int height)
         {
-            var resized = magickImage.Clone();
+            using var resized = magickImage.Clone();
             resized.Resize((uint)width, (uint)height);
-            using (var ms = new MemoryStream())
-            {
-                resized.Write(ms, MagickFormat.Bmp);
-                ms.Seek(0, SeekOrigin.Begin);
-                return new Bitmap(ms);
-            }
+            using var ms = new MemoryStream();
+            resized.Write(ms, MagickFormat.Bmp);
+            ms.Seek(0, SeekOrigin.Begin);
+            return new Bitmap(ms);
         }
 
         private bool ProceedWithImport(LogMonitorState state)
@@ -245,8 +248,9 @@ namespace Observatory.Photographer
                 _settings.ImportDuringReadAll
                 || _settings.ProcessDuringReadAll
                 || !state.HasFlag(LogMonitorState.Batch);
+            
             var realtimeCheck =
-                _settings.ProcessWhileMonitoring || !state.HasFlag(LogMonitorState.Realtime);
+                _settings.ProcessWhileMonitoring && state.HasFlag(LogMonitorState.Realtime);
 
             // Don't ever process from pre-read
             return (batchCheck || realtimeCheck) && !state.HasFlag(LogMonitorState.PreRead);

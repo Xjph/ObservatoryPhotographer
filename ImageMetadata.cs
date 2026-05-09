@@ -8,17 +8,19 @@ namespace Observatory.Photographer
     {
         public ImageWithMetadata(MagickImage image, Screenshot screenshot)
         {
-            Image = image;
+            _image = image;
             Screenshot = screenshot;
-            Overlay = new MagickImage(MagickColors.Transparent, image.Width, image.Height);
+            _overlay = new MagickImage(MagickColors.Transparent, image.Width, image.Height);
+            Filename = string.Empty;
         }
 
-        public ImageWithMetadata(MagickImage image, Screenshot screenshot, Status? status)
+        public ImageWithMetadata(string filename, Screenshot screenshot, Status? status)
         {
-            Image = image;
+            Filename = filename;
+            _image = null;
+            _overlay = null;
             Screenshot = screenshot;
             Status = status;
-            Overlay = new MagickImage(MagickColors.Transparent, image.Width, image.Height);
         }
 
         public bool HasStatus => Status is not null;
@@ -29,9 +31,23 @@ namespace Observatory.Photographer
         // Status metadata
         public Status? Status { get; private set; }
 
-        public MagickImage Image { get; private set; }
+        public MagickImage Image 
+        { 
+            get
+            {
+                _image ??= new MagickImage(Filename);
+                return _image;
+            }
+        }
 
-        public MagickImage Overlay { get; private set; }
+        public MagickImage Overlay 
+        { 
+            get
+            {
+                _overlay ??= new MagickImage(MagickColors.Transparent, Image.Width, Image.Height);
+                return _overlay;
+            }
+        }
 
         public void Dispose()
         {
@@ -39,5 +55,9 @@ namespace Observatory.Photographer
             Overlay.Dispose();
             GC.SuppressFinalize(this);
         }
+
+        public string Filename { get; private set; }
+        private MagickImage? _image;
+        private MagickImage? _overlay;
     }
 }
