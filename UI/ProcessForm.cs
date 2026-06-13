@@ -310,6 +310,11 @@ namespace Observatory.Photographer.UI
                     QualitySpinner.Value = 100;
                     QualitySpinner.Visible = false;
                     break;
+                case "JPEG-XL":
+                    _saveAction.Format = MagickFormat.Jxl;
+                    QualitySpinner.Value = 100;
+                    QualitySpinner.Visible = false;
+                    break;
             }
         }
 

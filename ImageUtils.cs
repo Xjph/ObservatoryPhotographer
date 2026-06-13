@@ -668,11 +668,12 @@ namespace Observatory.Photographer
 
             var (extension, validExtensions) = action.Format switch
             {
-                MagickFormat.Jpeg => (".jpg", new string[] { ".jpg", ".jpeg", ".jpe", ".jfif" }),
+                MagickFormat.Jpeg => (".jpg", new string[] { ".jpg", ".jpeg" }),
                 MagickFormat.Png => (".png", [".png"]),
-                MagickFormat.Heic => (".heic", [".heic", ".heif"]),
+                MagickFormat.Heic => (".heic", [".heic"]),
                 MagickFormat.WebP => (".webp", [".webp"]),
-                MagickFormat.Bmp => (".bmp", [".bmp", ".dib"]),
+                MagickFormat.Bmp => (".bmp", [".bmp"]),
+                MagickFormat.Jxl => (".jxl", [".jxl"]),
                 _ => throw new ArgumentException("Unsupported format"),
             };
 
