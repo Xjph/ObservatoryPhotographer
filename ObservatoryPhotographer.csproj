@@ -18,7 +18,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Magick.NET-Q8-x64" Version="14.12.0" />
+    <PackageReference Include="Magick.NET-Q8-x64" Version="14.14.0" />
   </ItemGroup>
 
   <PropertyGroup>
@@ -26,14 +26,8 @@
   </PropertyGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec
-      Condition=" '$(OS)' == 'Windows_NT' "
-      Command="powershell -command &quot;Get-ChildItem -Path '$(TargetDir)runtimes' -Directory -Exclude 'win-x64' | Remove-Item -Recurse -Force&quot;"
-    />
-    <Exec
-      Condition=" '$(OS)' == 'Windows_NT' "
-      Command="xcopy &quot;$(TargetDir)*&quot; &quot;$(ProjectDir)..\ObservatoryCore\ObservatoryCore\$(OutDir)plugins\ObservatoryPhotographer\&quot; /y /s /exclude:$(ProjectDir)xcopyExclude"
-    />
+    <Exec Condition=" '$(OS)' == 'Windows_NT' " Command="powershell -command &quot;Get-ChildItem -Path '$(TargetDir)runtimes' -Directory -Exclude 'win-x64' | Remove-Item -Recurse -Force&quot;" />
+    <Exec Condition=" '$(OS)' == 'Windows_NT' " Command="xcopy &quot;$(TargetDir)*&quot; &quot;$(ProjectDir)..\ObservatoryCore\ObservatoryCore\$(OutDir)plugins\ObservatoryPhotographer\&quot; /y /s /exclude:$(ProjectDir)xcopyExclude" />
   </Target>
 
   <ItemGroup>
