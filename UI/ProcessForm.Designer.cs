@@ -86,7 +86,7 @@
             // 
             ConvertDropdown.DropDownStyle = ComboBoxStyle.DropDownList;
             ConvertDropdown.FormattingEnabled = true;
-            ConvertDropdown.Items.AddRange(new object[] { "JPEG", "PNG", "HEIC", "WEBP", "BMP" });
+            ConvertDropdown.Items.AddRange(new object[] { "JPEG", "PNG", "HEIC", "WEBP", "JPEG-XL", "BMP" });
             ConvertDropdown.Location = new Point(63, 10);
             ConvertDropdown.Name = "ConvertDropdown";
             ConvertDropdown.Size = new Size(126, 23);
