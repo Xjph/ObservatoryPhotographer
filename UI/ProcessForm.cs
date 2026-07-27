@@ -120,12 +120,12 @@ namespace Observatory.Photographer.UI
                 switch (action)
                 {
                     case SaveAction saveAction:
-                        _saveAction = saveAction;
                         FilenameTextbox.Text = saveAction.FilePattern;
                         MetadataCheckbox.Checked = saveAction.IncludeMetadata;
                         switch (saveAction.Format)
                         {
                             case MagickFormat.Jpeg:
+                                System.Diagnostics.Debugger.Break();
                                 ConvertDropdown.SelectedItem = "JPEG";
                                 QualitySpinner.Value =
                                     saveAction.Quality > 0 ? saveAction.Quality : 85;
@@ -154,18 +154,18 @@ namespace Observatory.Photographer.UI
                                 QualitySpinner.Visible = false;
                                 break;
                         }
+                        _saveAction = saveAction;
                         break;
                     case WatermarkAction watermarkAction:
-                        _watermarkAction = watermarkAction;
                         WatermarkCheckbox.Checked = true;
+                        _watermarkAction = watermarkAction;
                         break;
                     case CaptionAction captionAction:
-                        _captionAction = captionAction;
                         CaptionTextbox.Text = captionAction.Text;
                         CaptionCheckbox.Checked = true;
+                        _captionAction = captionAction;
                         break;
                     case ResizeAction resizeAction:
-                        _resizeAction = resizeAction;
                         ResizeCheckbox.Checked = true;
                         if (resizeAction.Relative)
                         {
@@ -178,6 +178,7 @@ namespace Observatory.Photographer.UI
                             ResizeXSpinner.Value = resizeAction.X;
                             ResizeYSpinner.Value = resizeAction.Y;
                         }
+                        _resizeAction = resizeAction;
                         break;
                 }
             }
