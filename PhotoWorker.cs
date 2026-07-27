@@ -55,7 +55,7 @@ namespace Observatory.Photographer
         public static Guid Guid => new("AEA9A421-94FB-40D9-BCFF-AB899B279325");
 
         string IObservatoryPlugin.Version =>
-            (typeof(PhotoWorker).Assembly.GetName().Version?.ToString() ?? "0") + "-Patreon";
+            (typeof(PhotoWorker).Assembly.GetName().Version?.ToString() ?? "0");
 
         PluginUI IObservatoryPlugin.PluginUI => _pluginUI;
 
