@@ -125,7 +125,6 @@ namespace Observatory.Photographer.UI
                         switch (saveAction.Format)
                         {
                             case MagickFormat.Jpeg:
-                                System.Diagnostics.Debugger.Break();
                                 ConvertDropdown.SelectedItem = "JPEG";
                                 QualitySpinner.Value =
                                     saveAction.Quality > 0 ? saveAction.Quality : 85;
@@ -193,10 +192,8 @@ namespace Observatory.Photographer.UI
             IEnumerable<PhotoAction> actionList;
             try
             {
-                var defaultAction =
-                    ((PhotoSettings?)_worker.Settings)?.DefaultPreset ?? string.Empty;
                 _photoData.SavedPresets.TryGetValue(
-                    defaultAction,
+                    Photographer.DEFAULT_PRESET,
                     out IEnumerable<PhotoAction>? defaultActions
                 );
                 actionList = defaultActions ?? [];
@@ -249,14 +246,12 @@ namespace Observatory.Photographer.UI
 
         private void SetDefaultButton_Click(object sender, EventArgs e)
         {
-            var settings = (PhotoSettings?)_worker?.Settings;
-            if (settings is null)
-                return;
-            settings.DefaultPreset = string.IsNullOrEmpty(_currentPreset)
-                ? "Default"
-                : _currentPreset;
+            if (_photoData.SavedPresets.ContainsKey(Photographer.DEFAULT_PRESET))
+                _photoData.SavedPresets[Photographer.DEFAULT_PRESET] = BuildActionList();
+            else
+                _photoData.SavedPresets.Add(Photographer.DEFAULT_PRESET, BuildActionList());
 
-            _core?.SaveSettings(_worker);
+            _photoData.SavePresets();
         }
 
         private List<PhotoAction> BuildActionList()

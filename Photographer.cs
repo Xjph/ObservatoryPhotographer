@@ -18,6 +18,7 @@ namespace Observatory.Photographer
         private ConcurrentBag<Task> _processingTasks = [];
         private PhotoData _photoData;
         public readonly Action<Exception, string> Errorlogger;
+        public static readonly string DEFAULT_PRESET = "Default";
 
         public Photographer(
             IObservatoryCore core,
@@ -207,7 +208,7 @@ namespace Observatory.Photographer
         private IEnumerable<PhotoAction> GetDefaultActions()
         {
             _photoData.SavedPresets.TryGetValue(
-                _settings.DefaultPreset,
+                DEFAULT_PRESET,
                 out IEnumerable<PhotoAction>? defaultActions
             );
             return defaultActions

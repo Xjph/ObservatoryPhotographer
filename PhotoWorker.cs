@@ -29,8 +29,7 @@ namespace Observatory.Photographer
                 ScreenshotLocationPath = defaultScreenshotLocation,
                 OutputLocationPath = defaultOutputLocation,
                 ProcessDuringReadAll = false,
-                ProcessWhileMonitoring = true,
-                DefaultPreset = string.Empty,
+                ProcessWhileMonitoring = true
             };
 
             _mainPanel = new();

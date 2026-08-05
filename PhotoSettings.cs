@@ -59,9 +59,6 @@ namespace Observatory.Photographer
         [SettingIgnore]
         public required string OutputLocationPath { get; set; }
 
-        [SettingIgnore]
-        public required string DefaultPreset { get; set; }
-
         private bool _processDuringReadAll;
     }
 }
