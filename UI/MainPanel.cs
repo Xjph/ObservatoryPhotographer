@@ -58,7 +58,7 @@ namespace Observatory.Photographer.UI
             }
             else
             {
-                var processForm = new ProcessForm(Core!, Worker!);
+                var processForm = new ProcessForm(Core!, Worker!, Photographer!.PhotoData);
                 Core?.RegisterControl(processForm);
                 processForm.StartPosition = FormStartPosition.Manual;
                 processForm.Location = Point.Add(
