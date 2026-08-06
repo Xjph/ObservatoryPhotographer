@@ -651,7 +651,7 @@ namespace Observatory.Photographer
 
             var filename = FillTokenizedString(action.FilePattern, imageData, action.CmdrName);
             var sanitizedCharacters = filename
-                .Where(c => !Path.GetInvalidPathChars().Contains(c))
+                .Where(c => !Path.GetInvalidFileNameChars().Contains(c) || c == Path.DirectorySeparatorChar)
                 .ToArray();
 
             filename = new string(sanitizedCharacters);
