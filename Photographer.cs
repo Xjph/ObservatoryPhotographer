@@ -16,7 +16,7 @@ namespace Observatory.Photographer
         private PhotoSettings _settings;
         private Dictionary<string, ImageWithMetadata> _imageData;
         private ConcurrentBag<Task> _processingTasks = [];
-        private PhotoData _photoData;
+        public readonly PhotoData PhotoData;
         public readonly Action<Exception, string> Errorlogger;
         public static readonly string DEFAULT_PRESET = "Default";
 
@@ -40,7 +40,7 @@ namespace Observatory.Photographer
             _ui.PhotoListView.LargeImageList.ImageSize = new Size(256, 256);
             _settings = photoSettings;
             _imageData = [];
-            _photoData = new(core, errorLogger);
+            PhotoData = new(core, errorLogger);
             _ui.PhotoListView.SelectedIndexChanged += SelectedImageChanged;
         }
 
@@ -150,13 +150,13 @@ namespace Observatory.Photographer
                                     status = _core.GetStatus();
                                     if (status != null)
                                     {
-                                        _photoData.ScreenshotStatus[file.FullName] = status;
-                                        _photoData.SaveStatus();
+                                        PhotoData.ScreenshotStatus[file.FullName] = status;
+                                        PhotoData.SaveStatus();
                                     }
                                 }
                                 else
                                 {
-                                    _photoData.ScreenshotStatus.TryGetValue(
+                                    PhotoData.ScreenshotStatus.TryGetValue(
                                         file.FullName,
                                         out status
                                     );
@@ -207,7 +207,7 @@ namespace Observatory.Photographer
 
         private IEnumerable<PhotoAction> GetDefaultActions()
         {
-            _photoData.SavedPresets.TryGetValue(
+            PhotoData.SavedPresets.TryGetValue(
                 DEFAULT_PRESET,
                 out IEnumerable<PhotoAction>? defaultActions
             );

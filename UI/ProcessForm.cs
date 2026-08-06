@@ -19,7 +19,7 @@ namespace Observatory.Photographer.UI
         private readonly PhotoWorker _worker;
         private string _currentPreset = string.Empty;
 
-        public ProcessForm(ImageWithMetadata metadata, IObservatoryCore core, PhotoWorker worker)
+        public ProcessForm(ImageWithMetadata metadata, IObservatoryCore core, PhotoWorker worker, PhotoData photoData)
         {
             _image = metadata;
             _captionAction = new()
@@ -47,7 +47,7 @@ namespace Observatory.Photographer.UI
             };
             _core = core;
             _worker = worker;
-            _photoData = new(core, core.GetPluginErrorLogger(worker));
+            _photoData = photoData;
             CancelButton = CancelBtn;
             InitializeComponent();
             RestoreSavedProcess();
