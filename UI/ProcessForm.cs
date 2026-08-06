@@ -58,7 +58,7 @@ namespace Observatory.Photographer.UI
             FilenameTooltip.SetToolTip(ExampleLabel, string.Empty);
         }
 
-        public ProcessForm(IObservatoryCore core, PhotoWorker worker)
+        public ProcessForm(IObservatoryCore core, PhotoWorker worker, PhotoData photoData)
         {
             _image = new(
                 new(MagickColors.White, 1, 1),
@@ -99,7 +99,7 @@ namespace Observatory.Photographer.UI
             };
             _core = core;
             _worker = worker;
-            _photoData = new(core, core.GetPluginErrorLogger(worker));
+            _photoData = photoData;
             InitializeComponent();
             RestoreSavedProcess();
             CancelButton = CancelBtn;
