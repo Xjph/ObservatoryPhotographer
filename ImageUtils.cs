@@ -479,6 +479,8 @@ namespace Observatory.Photographer
             return tokenizedString;
         }
 
+        // Finds the "least busy" quadrant of an image by JPEG compressing
+        // each quadrant individually and checking which one is smallest.
         public static int FindOpenQuad(MagickImage image, bool twoPass = false)
         {
             var quads = image.CropToTiles(image.Width / 2, image.Height / 2);
