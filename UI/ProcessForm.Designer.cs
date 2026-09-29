@@ -292,7 +292,7 @@
             // 
             // MetadataCheckbox
             // 
-            MetadataCheckbox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            MetadataCheckbox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             MetadataCheckbox.AutoSize = true;
             MetadataCheckbox.Location = new Point(12, 284);
             MetadataCheckbox.Name = "MetadataCheckbox";
@@ -403,8 +403,9 @@
             // 
             // SeparateCheckbox
             // 
+            SeparateCheckbox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             SeparateCheckbox.AutoSize = true;
-            SeparateCheckbox.Location = new Point(134, 285);
+            SeparateCheckbox.Location = new Point(134, 284);
             SeparateCheckbox.Name = "SeparateCheckbox";
             SeparateCheckbox.Size = new Size(112, 19);
             SeparateCheckbox.TabIndex = 25;
