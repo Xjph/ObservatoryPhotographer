@@ -112,8 +112,17 @@ namespace Observatory.Photographer
                                     if (staleItem.Any())
                                     {
                                         UiExec(() =>
-                                            _ui.PhotoListView.Items.Remove(staleItem.First())
-                                        );
+                                        {
+                                            try
+                                            {
+                                                _ui.PhotoListView.Items.Remove(staleItem.First());
+                                            } 
+                                            catch 
+                                            { 
+                                                // Already gone?
+                                            }
+                                        
+                                        });
                                     }
                                 }
                                 else
@@ -162,6 +171,7 @@ namespace Observatory.Photographer
                                     );
                                 }
 
+                                _imageData[file.FullName] = new(file.FullName, screenshot, status);
                                 UiExec(() =>
                                 {
                                     _ui.PhotoListView.Items.Add(
@@ -173,7 +183,6 @@ namespace Observatory.Photographer
                                     );
                                     _ui.PhotoListView.Sort();
                                 });
-                                _imageData[file.FullName] = new(file.FullName,screenshot, status);
 
                                 if (ProceedWithProcessing(_core.CurrentLogMonitorState))
                                 {
