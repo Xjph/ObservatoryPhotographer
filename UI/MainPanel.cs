@@ -48,11 +48,9 @@ namespace Observatory.Photographer.UI
                     );
                     var processForm = new ProcessForm(clonedMeta, Core!, Worker!, Photographer!.PhotoData);
                     Core?.RegisterControl(processForm);
+
                     processForm.StartPosition = FormStartPosition.Manual;
-                    processForm.Location = Point.Add(
-                        Application.OpenForms[0]?.Location ?? Point.Empty,
-                        new Size(100, 100)
-                    );
+                    processForm.Location = GetProcessLocation();
                     processForm.ShowDialog();
                 }
             }
@@ -61,12 +59,27 @@ namespace Observatory.Photographer.UI
                 var processForm = new ProcessForm(Core!, Worker!, Photographer!.PhotoData);
                 Core?.RegisterControl(processForm);
                 processForm.StartPosition = FormStartPosition.Manual;
-                processForm.Location = Point.Add(
-                    Application.OpenForms[0]?.Location ?? Point.Empty,
-                    new Size(100, 100)
-                );
+                processForm.Location = GetProcessLocation();
                 processForm.ShowDialog();
             }
+        }
+
+        private static Point GetProcessLocation()
+        {
+            // Grab main form location but override with Photographer popout if present.
+            Point location = Point.Add(Application.OpenForms[0]?.Location ?? Point.Empty, new Size(100, 100));
+            foreach (Form form in Application.OpenForms)
+            {
+                if (form.Text == "Observatory Photographer")
+                {
+                    location = Point.Add(
+                        form.Location,
+                        new Size(100, 100)
+                    );
+                    break;
+                }
+            }
+            return location;
         }
     }
 }

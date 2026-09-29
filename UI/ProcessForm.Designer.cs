@@ -347,6 +347,7 @@
             // 
             // ExampleLabel
             // 
+            ExampleLabel.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             ExampleLabel.Location = new Point(6, 19);
             ExampleLabel.Name = "ExampleLabel";
             ExampleLabel.Size = new Size(286, 15);
