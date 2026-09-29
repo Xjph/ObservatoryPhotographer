@@ -122,6 +122,7 @@ namespace Observatory.Photographer.UI
                     case SaveAction saveAction:
                         FilenameTextbox.Text = saveAction.FilePattern;
                         MetadataCheckbox.Checked = saveAction.IncludeMetadata;
+                        SeparateCheckbox.Checked = saveAction.SeparateOutput;
                         switch (saveAction.Format)
                         {
                             case MagickFormat.Jpeg:
