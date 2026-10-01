@@ -490,9 +490,9 @@ namespace Observatory.Photographer
                 q.Format = MagickFormat.Jpeg;
                 q.Write(qStream);
                 return qStream.Length;
-            });
+            }).ToList();
             long minSize = quadSizes.Min();
-            var minIndex = quadSizes.ToList().IndexOf(minSize);
+            var minIndex = quadSizes.IndexOf(minSize);
             if (twoPass)
             {
                 using var nextPass = new MagickImage(quads[minIndex]);
