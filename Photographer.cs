@@ -152,9 +152,9 @@ namespace Observatory.Photographer
                                     itemLabel = screenshot.Timestamp;
 
                                 Status? status = null;
-                                var isRealtime = StatusIsCurrent(_core.CurrentLogMonitorState);
+                                var mayUseStatus = StatusDataIsRelevant(_core.CurrentLogMonitorState);
 
-                                if (isRealtime)
+                                if (mayUseStatus)
                                 {
                                     status = _core.GetStatus();
                                     if (status != null)
@@ -212,7 +212,7 @@ namespace Observatory.Photographer
                 !state.HasFlag(LogMonitorState.PreRead)
                 && state.HasFlag(LogMonitorState.Batch)
                 && _settings.ProcessDuringReadAll
-            ) || (state.HasFlag(LogMonitorState.Realtime) && _settings.ProcessWhileMonitoring);
+            ) || (state == LogMonitorState.Realtime && _settings.ProcessWhileMonitoring);
 
         private IEnumerable<PhotoAction> GetDefaultActions()
         {
@@ -255,19 +255,21 @@ namespace Observatory.Photographer
         private bool ProceedWithImport(LogMonitorState state)
         {
             var batchCheck =
-                _settings.ImportDuringReadAll
-                || _settings.ProcessDuringReadAll
-                || !state.HasFlag(LogMonitorState.Batch);
+                (_settings.ImportDuringReadAll || _settings.ProcessDuringReadAll)
+                && state.HasFlag(LogMonitorState.Batch);
             
             var realtimeCheck =
-                _settings.ProcessWhileMonitoring && state.HasFlag(LogMonitorState.Realtime);
+                _settings.ProcessWhileMonitoring
+                // Exact match required: Read-all is Realtime | Batch -- don't want to return true in that situation.
+                && state == LogMonitorState.Realtime; 
 
             // Don't ever process from pre-read
             return (batchCheck || realtimeCheck) && !state.HasFlag(LogMonitorState.PreRead);
         }
 
-        private bool StatusIsCurrent(LogMonitorState state) =>
-            state.HasFlag(LogMonitorState.Realtime);
+        private bool StatusDataIsRelevant(LogMonitorState state) =>
+            // Exact match required: Read-all is Realtime | Batch -- don't want to return true in that situation.
+            state == LogMonitorState.Realtime;
 
         private string CreateImageDataText(Screenshot screenshot, string fullFilename)
         {
